@@ -22,9 +22,15 @@ self.addEventListener('push', event => {
       body: data.body || '',
       icon: './icon-192.png',
       badge: './icon-192.png',
-      vibrate: [200, 100, 200],
+      image: './frozen-verity.png',   // ← картинка в уведомлении
+      vibrate: [200, 100, 200, 100, 200],
       tag: 'verity-message',
-      renotify: true
+      renotify: true,
+      requireInteraction: true,       // ← уведомление не исчезает само
+      actions: [
+        { action: 'open', title: '🔥 Согреть' },
+        { action: 'later', title: 'Позже' }
+      ]
     })
   );
 });
@@ -32,6 +38,8 @@ self.addEventListener('push', event => {
 /* Клик по уведомлению — открыть сайт */
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+  if (event.action === 'later') return;
+
   event.waitUntil(
     self.clients.matchAll({ type: 'window' }).then(clientList => {
       for (const client of clientList) {
