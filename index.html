@@ -216,7 +216,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <button class="menu-item" id="miExport" type="button"><span>📤</span><span>Экспорт диалога</span></button>
 
   <div style="margin-top:auto;padding-top:20px;text-align:center;color:var(--txt-3);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;line-height:1.8;">
-    Verity · Beta 0.4<br>
+    Verity · Beta 0.5<br>
     <span style="opacity:.6;">умный друг</span>
   </div>
 </aside>
@@ -252,7 +252,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <div class="modal-box">
     <button class="modal-close" type="button" data-close>×</button>
     <div class="modal-title">⚙️ Настройки</div>
-    <div class="modal-sub">Verity Beta 0.4</div>
+    <div class="modal-sub">Verity Beta 0.5</div>
     <div class="set-row"><div><div class="set-title">Имя Verity</div><div class="set-desc">Как он себя называет</div></div><input type="text" class="set-input" id="setName" value="Verity" maxlength="20"></div>
     <div class="set-row"><div><div class="set-title">Показывать время</div><div class="set-desc">В сообщениях</div></div><div class="switch on" id="setTime"></div></div>
     <div class="set-row"><div><div class="set-title">Удалить всё</div><div class="set-desc">История + память</div></div><button class="btn danger" id="wipeBtn" type="button">Удалить</button></div>
@@ -265,11 +265,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
     <div class="modal-title">О Verity</div>
     <div class="modal-sub">Друг, который помнит</div>
     <div style="color:var(--txt-2);font-size:.9rem;line-height:1.7;">
-      <b style="color:var(--gold-2);">Verity</b> — виртуальный друг на базе Llama 3.3 70B. Он <b>слушает</b>, <b>запоминает</b> и <b>меняется</b> от твоего общения.
+      <b style="color:var(--gold-2);">Verity</b> — виртуальный друг на базе Llama 3.1 8B. Он <b>слушает</b>, <b>запоминает</b> и <b>меняется</b> от твоего общения.
     </div>
     <div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid var(--card-border);color:var(--txt-3);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;">
       Автор · Артем Колыбельский<br>
-      <span style="opacity:.6;">Beta 0.4 · 2026</span>
+      <span style="opacity:.6;">Beta 0.5 · 2026</span>
     </div>
   </div>
 </div>
@@ -288,8 +288,9 @@ const fmtTime = ts => { const d = new Date(ts); return String(d.getHours()).padS
 const uid = () => now().toString(36) + Math.random().toString(36).slice(2,7);
 const escapeHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+/* ─── API ─── */
 const API_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/api/ai/chat';
-const API_TIMEOUT = 60000;
+const API_TIMEOUT = 45000;
 const HISTORY_LIMIT = 5;
 
 const STORE_KEY = 'verity_v1';
@@ -306,16 +307,16 @@ function save(){ try{ STORE.lastSeen = now(); localStorage.setItem(STORE_KEY, JS
 function load(){ try{ const r = localStorage.getItem(STORE_KEY); if(r) STORE = Object.assign(STORE, JSON.parse(r)); }catch(e){} }
 
 const FALLBACK = {
-  sad: ['Расскажи, что случилось. Я тут.', 'Слышу тебя. Это тяжко.', 'Хочешь поговорить об этом?', 'Я рядом. Просто помни.', 'Ты не один.', 'Обнимаю. Крепко.', 'Ты справишься. Я верю.'],
-  happy: ['Класс! Расскажи подробнее!', 'Это радует. Правда.', 'Отличные новости!', 'Так держать!', 'Рад за тебя.', 'Улыбаюсь.'],
-  angry: ['Я понимаю, почему злишься.', 'Не торопись. Дыши.', 'Давай разберём, что не так.', 'Злиться — нормально.', 'Расскажи, что бесит.', 'Дыши глубже. Я рядом.'],
-  tired: ['Ты много сегодня сделал.', 'Полежи. Мир подождёт.', 'Отдохни. Я никуда не денусь.', 'Может, чай?', 'Спи. Завтра будет легче.', 'Ты имеешь право на отдых.'],
-  question: ['Интересный вопрос. Что ты сам думаешь?', 'Хм. Давай вместе подумаем.', 'Не уверен. А как ты считаешь?', 'Хороший вопрос, не простой.', 'Расскажи, почему спрашиваешь.'],
-  neutral: ['Расскажи ещё.', 'Понимаю.', 'Хм. Интересно.', 'Я слушаю.', 'Как ты сейчас?', 'Продолжай.', 'Понял.', 'Рассказывай дальше.'],
+  sad: ['Расскажи, что случилось. Я тут.', 'Слышу тебя. Это тяжко.', 'Хочешь поговорить об этом?', 'Я рядом. Просто помни.', 'Ты не один.'],
+  happy: ['Класс! Расскажи подробнее!', 'Это радует. Правда.', 'Отличные новости!', 'Так держать!', 'Рад за тебя.'],
+  angry: ['Я понимаю, почему злишься.', 'Не торопись. Дыши.', 'Давай разберём, что не так.', 'Злиться — нормально.'],
+  tired: ['Ты много сегодня сделал.', 'Полежи. Мир подождёт.', 'Отдохни. Я никуда не денусь.', 'Может, чай?'],
+  question: ['Интересный вопрос. Что ты сам думаешь?', 'Хм. Давай вместе подумаем.', 'Не уверен. А как ты считаешь?'],
+  neutral: ['Расскажи ещё.', 'Понимаю.', 'Хм. Интересно.', 'Я слушаю.', 'Как ты сейчас?', 'Продолжай.'],
   greeting: ['Привет! Как ты?', 'Привет. Рад тебя видеть.', 'Хэй. Как дела?'],
   farewell: ['Пока. Возвращайся.', 'До связи. Я тут.', 'Хорошего дня. Буду ждать.'],
-  gratitude: ['Всегда рад.', 'Не за что.', 'Обращайся.', 'Приятно помочь.'],
-  apology: ['Всё хорошо.', 'Ничего страшного.', 'Забыли.', 'Я не обижаюсь.']
+  gratitude: ['Всегда рад.', 'Не за что.', 'Обращайся.'],
+  apology: ['Всё хорошо.', 'Ничего страшного.', 'Забыли.']
 };
 
 function analyzeIntent(text){
@@ -353,48 +354,40 @@ function extractMemory(text){
   if (nameM) mems.push({ icon: '👤', text: `Тебя зовут ${nameM[1]}` });
   const ageM = text.match(/\b(мне|у меня)\s+(\d{1,2})\s*(?:лет|года|год)/i);
   if (ageM && +ageM[2] < 120) mems.push({ icon: '🎂', text: `Тебе ${ageM[2]} лет` });
-  const loveM = text.match(/(?:я люблю|обожаю|мне нравится)\s+([а-яёa-z\s\-]{3,30})/i);
-  if (loveM) mems.push({ icon: '❤️', text: `Ты любишь ${loveM[1].trim()}` });
-  const cityM = text.match(/(?:я живу в|живу в|я из)\s+([А-ЯЁA-Z][а-яёa-z\-]+)/i);
-  if (cityM) mems.push({ icon: '🏙️', text: `Ты живёшь в ${cityM[1]}` });
   return mems;
 }
 
 function updateMood(intent){
   const m = STORE.mood;
-  if (intent.isHappy) { m.trust = clamp(m.trust+3,0,100); m.warm = clamp(m.warm+5,0,100); m.energy = clamp(m.energy+2,0,100); m.grudge = clamp(m.grudge-3,0,100); }
+  if (intent.isHappy) { m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-3,0,100); }
   if (intent.isSad)   { m.warm = clamp(m.warm+2,0,100); m.energy = clamp(m.energy-3,0,100); }
-  if (intent.isAngry) { m.grudge = clamp(m.grudge+15,0,100); m.trust = clamp(m.trust-8,0,100); m.warm = clamp(m.warm-5,0,100); }
+  if (intent.isAngry) { m.grudge = clamp(m.grudge+15,0,100); }
   if (intent.isTired) { m.energy = clamp(m.energy-5,0,100); }
-  if (intent.isQuestion) { m.trust = clamp(m.trust+2,0,100); }
-  if (intent.isGratitude){ m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-10,0,100); }
-  if (intent.isGreeting){ m.warm = clamp(m.warm+2,0,100); }
-  if (intent.isApology){ m.grudge = clamp(m.grudge-15,0,100); m.trust = clamp(m.trust+3,0,100); }
   m.grudge = clamp(m.grudge-0.5,0,100);
-  if (m.energy < 30) m.energy = clamp(m.energy+0.3,0,100);
 }
 
-/* ─── API-ЗАПРОС (с историей) ─── */
+/* ═══════════════════════════════════════════════════════
+   API-ЗАПРОС ЧЕРЕЗ GET (обход блокировки POST)
+   ═══════════════════════════════════════════════════════ */
 async function askVerity(userText){
   const history = STORE.messages
     .filter(m => m.from === 'user' || m.from === 'verity')
     .slice(-HISTORY_LIMIT)
-    .map(m => ({
-      role: m.from === 'user' ? 'user' : 'assistant',
-      content: m.text
-    }));
+    .map(m => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
+
+  // Собираем URL с параметрами
+  const params = new URLSearchParams();
+  params.set('message', userText);
+  params.set('history', JSON.stringify(history));
+
+  const fullUrl = API_URL + '?' + params.toString();
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), API_TIMEOUT);
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: userText,
-        history: history
-      }),
+    const res = await fetch(fullUrl, {
+      method: 'GET',
       signal: controller.signal
     });
     clearTimeout(timer);
@@ -403,7 +396,7 @@ async function askVerity(userText){
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    const reply = data.reply || data.message || data.content || data.text;
+    const reply = data.reply || data.message || data.content;
     if (!reply || typeof reply !== 'string' || !reply.trim()) throw new Error('Пустой ответ');
 
     console.log('✅ Verity ответил:', reply.slice(0, 80));
@@ -416,6 +409,7 @@ async function askVerity(userText){
   }
 }
 
+/* ─── UI ─── */
 function renderMessage(msg){
   const chat = $('chat');
   const el = document.createElement('div');
@@ -657,14 +651,10 @@ function toast(msg){
 
 function exportDialog(){
   if (STORE.messages.length === 0) { toast('Диалог пуст'); return; }
-  let txt = `═══ Verity — Диалог ═══\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\nСообщений: ${STORE.messages.length}\nПамять: ${STORE.memory.length}\n\n`;
+  let txt = `═══ Verity — Диалог ═══\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\nСообщений: ${STORE.messages.length}\n\n`;
   STORE.messages.forEach(m => {
     txt += `[${fmtTime(m.time)}] ${m.from === 'user' ? 'Ты' : STORE.verityName}: ${m.text}\n`;
   });
-  if (STORE.memory.length) {
-    txt += `\n═══ Память ═══\n`;
-    STORE.memory.forEach(mm => { txt += `${mm.icon} ${mm.text}\n`; });
-  }
   try {
     navigator.clipboard.writeText(txt).then(
       () => toast('📤 Скопировано'),
