@@ -58,8 +58,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 #logoText{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 #moodSub{font-size:.66rem;color:var(--txt-2);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
 #avatarBtn{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--gold-1),var(--gold-2),var(--gold-3));border:2px solid var(--gold-2);display:grid;place-items:center;font-size:1.3rem;color:#0a0a0a;cursor:pointer;box-shadow:0 0 20px rgba(212,175,55,.5);position:relative}
-#avatarBtn::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--gold-2);opacity:.4;animation:avatarRing 3s ease-in-out infinite}
-@keyframes avatarRing{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.1);opacity:.15}}
 
 #chat{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 #chat::-webkit-scrollbar{width:4px}
@@ -75,6 +73,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 @keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 .msg.verity{align-self:flex-start;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-bottom-left-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
 .msg.user{align-self:flex-end;background:linear-gradient(180deg,rgba(212,175,55,.25),rgba(212,175,55,.1));border:1px solid color-mix(in srgb,var(--gold-2) 50%,transparent);border-bottom-right-radius:6px;box-shadow:0 4px 16px rgba(212,175,55,.15)}
+.msg.verity.angry{border-color:rgba(224,106,106,.5);background:linear-gradient(180deg,rgba(50,15,15,.92),rgba(30,10,10,.92));box-shadow:0 4px 20px rgba(224,106,106,.25)}
 .msg .time{font-size:.62rem;color:var(--txt-3);margin-top:4px;display:block;text-align:right}
 
 .typing{align-self:flex-start;padding:14px 18px;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-radius:16px;border-bottom-left-radius:6px;display:flex;gap:5px;align-items:center}
@@ -201,7 +200,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <button class="menu-item" id="miExport" type="button"><span>📤</span><span>Экспорт диалога</span></button>
 
   <div style="margin-top:auto;padding-top:20px;text-align:center;color:var(--txt-3);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;line-height:1.8;">
-    Verity · Beta 0.6<br>
+    Verity · Beta 0.7<br>
     <span style="opacity:.6;">умный друг</span>
   </div>
 </aside>
@@ -237,9 +236,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <div class="modal-box">
     <button class="modal-close" type="button" data-close>×</button>
     <div class="modal-title">⚙️ Настройки</div>
-    <div class="modal-sub">Verity Beta 0.6</div>
+    <div class="modal-sub">Verity Beta 0.7</div>
     <div class="set-row"><div><div class="set-title">Имя Verity</div><div class="set-desc">Как он себя называет</div></div><input type="text" class="set-input" id="setName" value="Verity" maxlength="20"></div>
     <div class="set-row"><div><div class="set-title">Показывать время</div><div class="set-desc">В сообщениях</div></div><div class="switch on" id="setTime"></div></div>
+    <div class="set-row"><div><div class="set-title">Спонтанные сообщения</div><div class="set-desc">Verity пишет сам, если долго молчишь</div></div><div class="switch on" id="setSpontaneous"></div></div>
+    <div class="set-row"><div><div class="set-title">Возраст</div><div class="set-desc">Меняет стиль общения</div></div><input type="number" class="set-input" id="setAge" placeholder="?" min="1" max="120"></div>
     <div class="set-row"><div><div class="set-title">Удалить всё</div><div class="set-desc">История + память</div></div><button class="btn danger" id="wipeBtn" type="button">Удалить</button></div>
   </div>
 </div>
@@ -254,14 +255,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
     </div>
     <div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid var(--card-border);color:var(--txt-3);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;">
       Автор · Артем Колыбельский<br>
-      <span style="opacity:.6;">Beta 0.6 · 2026</span>
+      <span style="opacity:.6;">Beta 0.7 · 2026</span>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
 <button id="pushBanner" type="button">🔔 Включить уведомления Verity</button>
-
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -277,29 +277,99 @@ const SUBSCRIBE_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/subscrib
 const PING_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/ping';
 const VAPID_PUBLIC = "BHAMI-kmZTSVa8w6cRd8pr18MmVG66vknMh8x6kNIDzLDpuOAzMspGkGlxB1EVE66PmoVjAUlG5VnDJN3dAQTjk";
 
-const STORE_KEY = 'verity_v2';
+/* ─── Хранилище ─── */
+const STORE_KEY = 'verity_v3';
 let STORE = {
   messages: [],
   mood: { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 },
   memory: [],
   verityName: 'Verity',
-  showTime: true
+  showTime: true,
+  spontaneous: true,
+  age: null,
+  lastActivity: now(),
+  lastSpontaneousCheck: 0
 };
 
 /* ─── userId ─── */
 function initUserId(){
   let id = localStorage.getItem('verity_userId');
   if (!id) {
-    id = 'u_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+    id = 'u_' + Math.random().toString(36).slice(2,10) + now().toString(36);
     localStorage.setItem('verity_userId', id);
   }
   STORE.userId = id;
 }
 
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }catch(e){} }
-function load(){ try{ const r = localStorage.getItem(STORE_KEY); if(r) STORE = Object.assign(STORE, JSON.parse(r)); }catch(e){} }
+function load(){
+  try{
+    const r = localStorage.getItem(STORE_KEY);
+    if (r) STORE = Object.assign(STORE, JSON.parse(r));
+  }catch(e){}
+}
 
-/* ─── API ─── */
+/* ─── Интенты ─── */
+function analyzeIntent(text){
+  const t = text.toLowerCase();
+  return {
+    isSad: /груст|плох|тяжк|плачу|депрес|больно|одинок|нет сил|тоск|уныл/.test(t),
+    isHappy: /рад|класс|отличн|круто|счаст|ура|кайф|супер|офиген|обожаю/.test(t),
+    isAngry: /бесит|злюсь|ненавиж|достал|злит|ярость|раздража/.test(t),
+    isTired: /устал|вымотал|измотан|валюсь|выгор/.test(t),
+    isGratitude: /спасибо|благодар|признателен/.test(t),
+    isApology: /извини|прости|сорри|виноват/.test(t),
+    isLove: /люблю|обожаю|скучал|скучаю/.test(t)
+  };
+}
+
+function updateMood(intent){
+  const m = STORE.mood;
+  if (intent.isHappy) { m.trust = clamp(m.trust+3,0,100); m.warm = clamp(m.warm+5,0,100); m.energy = clamp(m.energy+2,0,100); m.grudge = clamp(m.grudge-5,0,100); }
+  if (intent.isSad)   { m.warm = clamp(m.warm+2,0,100); m.energy = clamp(m.energy-3,0,100); }
+  if (intent.isAngry) { m.grudge = clamp(m.grudge+20,0,100); m.trust = clamp(m.trust-10,0,100); m.warm = clamp(m.warm-8,0,100); }
+  if (intent.isTired) { m.energy = clamp(m.energy-5,0,100); }
+  if (intent.isGratitude){ m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-12,0,100); }
+  if (intent.isApology){ m.grudge = clamp(m.grudge-20,0,100); m.trust = clamp(m.trust+5,0,100); }
+  if (intent.isLove)  { m.warm = clamp(m.warm+10,0,100); m.play = clamp(m.play+5,0,100); m.grudge = clamp(m.grudge-8,0,100); }
+  // Медленное угасание обиды
+  m.grudge = clamp(m.grudge-0.3,0,100);
+  if (m.energy < 30) m.energy = clamp(m.energy+0.3,0,100);
+}
+
+const MOOD_LABELS = {
+  calm:    { emoji: '🙂', name: 'Спокоен',  desc: 'Всё хорошо. Он рядом.' },
+  warm:    { emoji: '💛', name: 'Тёплый',   desc: 'Настроен на близость.' },
+  playful: { emoji: '😄', name: 'Игривый',  desc: 'Хочет пошутить.' },
+  tired:   { emoji: '😔', name: 'Устал',    desc: 'Нужно время.' },
+  hurt:    { emoji: '💔', name: 'Обижен',   desc: 'Что-то не так.' },
+  angry:   { emoji: '😡', name: 'В ярости', desc: 'Он не в себе.' }
+};
+function currentMoodKey(){
+  const m = STORE.mood;
+  if (m.grudge > 70) return 'angry';
+  if (m.grudge > 40) return 'hurt';
+  if (m.energy < 30) return 'tired';
+  if (m.play > 70 && m.warm > 60) return 'playful';
+  if (m.warm > 70) return 'warm';
+  return 'calm';
+}
+
+/* ─── Память ─── */
+function extractMemory(text){
+  const mems = [];
+  const nameM = text.match(/(?:меня зовут|моё имя|зови меня)\s+([А-ЯЁA-Z][а-яёa-z]+)/i);
+  if (nameM) mems.push({ icon: '👤', text: `Тебя зовут ${nameM[1]}` });
+  const ageM = text.match(/\b(мне|у меня)\s+(\d{1,2})\s*(?:лет|года|год)/i);
+  if (ageM && +ageM[2] < 120) mems.push({ icon: '🎂', text: `Тебе ${ageM[2]} лет` });
+  const loveM = text.match(/(?:я люблю|обожаю|мне нравится)\s+([а-яёa-z\s\-]{3,30})/i);
+  if (loveM) mems.push({ icon: '❤️', text: `Ты любишь ${loveM[1].trim()}` });
+  const cityM = text.match(/(?:я живу в|живу в|я из)\s+([А-ЯЁA-Z][а-яёa-z\-]+)/i);
+  if (cityM) mems.push({ icon: '🏙️', text: `Ты живёшь в ${cityM[1]}` });
+  return mems;
+}
+
+/* ─── Запрос к API ─── */
 async function askVerity(userText){
   const history = STORE.messages.slice(-5).map(m => ({
     role: m.from === 'user' ? 'user' : 'assistant',
@@ -310,6 +380,8 @@ async function askVerity(userText){
   params.set('message', userText);
   params.set('history', JSON.stringify(history));
   params.set('userId', STORE.userId || 'anon');
+  if (STORE.age) params.set('age', STORE.age);
+  params.set('mood', JSON.stringify(STORE.mood));
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 45000);
@@ -324,12 +396,16 @@ async function askVerity(userText){
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     if (!data.reply) throw new Error('Пустой ответ');
-    console.log('✅ Verity:', data.reply.slice(0, 60));
-    return data.reply.trim();
+    // Возвращаем массив частей
+    const parts = Array.isArray(data.parts) && data.parts.length
+      ? data.parts
+      : [data.reply];
+    console.log('✅ Verity:', parts);
+    return parts;
   } catch(e) {
     clearTimeout(timer);
     console.warn('⚠ API:', e.message);
-    return 'Я тут. Скажи что-нибудь.';
+    return [rand(['Я тут.', 'Я слушаю.', 'Расскажи мне.', 'Ты здесь?'])];
   }
 }
 
@@ -377,65 +453,16 @@ async function enablePush(){
 
 function pingActivity(){
   if (!STORE.userId) return;
+  STORE.lastActivity = now();
+  save();
   fetch(PING_URL + '?userId=' + STORE.userId).catch(() => {});
 }
-
-/* ─── Память ─── */
-function extractMemory(text){
-  const mems = [];
-  const nameM = text.match(/(?:меня зовут|моё имя|зови меня)\s+([А-ЯЁA-Z][а-яёa-z]+)/i);
-  if (nameM) mems.push({ icon: '👤', text: `Тебя зовут ${nameM[1]}` });
-  const ageM = text.match(/\b(мне|у меня)\s+(\d{1,2})\s*(?:лет|года|год)/i);
-  if (ageM && +ageM[2] < 120) mems.push({ icon: '🎂', text: `Тебе ${ageM[2]} лет` });
-  const loveM = text.match(/(?:я люблю|обожаю|мне нравится)\s+([а-яёa-z\s\-]{3,30})/i);
-  if (loveM) mems.push({ icon: '❤️', text: `Ты любишь ${loveM[1].trim()}` });
-  return mems;
-}
-
-/* ─── Настроение ─── */
-function analyzeIntent(text){
-  const t = text.toLowerCase();
-  return {
-    isSad: /груст|плох|тяжк|плачу|депрес|больно|одинок|нет сил|тоск|уныл/.test(t),
-    isHappy: /рад|класс|отличн|круто|счаст|ура|кайф|супер|офиген|обожаю/.test(t),
-    isAngry: /бесит|злюсь|ненавиж|достал|злит|ярость|раздража/.test(t),
-    isTired: /устал|вымотал|измотан|валюсь|выгор/.test(t),
-    isGratitude: /спасибо|благодар|признателен/.test(t),
-    isApology: /извини|прости|сорри|виноват/.test(t)
-  };
-}
-function updateMood(intent){
-  const m = STORE.mood;
-  if (intent.isHappy) { m.trust = clamp(m.trust+3,0,100); m.warm = clamp(m.warm+5,0,100); m.energy = clamp(m.energy+2,0,100); m.grudge = clamp(m.grudge-3,0,100); }
-  if (intent.isSad)   { m.warm = clamp(m.warm+2,0,100); m.energy = clamp(m.energy-3,0,100); }
-  if (intent.isAngry) { m.grudge = clamp(m.grudge+15,0,100); m.trust = clamp(m.trust-8,0,100); m.warm = clamp(m.warm-5,0,100); }
-  if (intent.isTired) { m.energy = clamp(m.energy-5,0,100); }
-  if (intent.isGratitude){ m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-10,0,100); }
-  if (intent.isApology){ m.grudge = clamp(m.grudge-15,0,100); m.trust = clamp(m.trust+3,0,100); }
-  m.grudge = clamp(m.grudge-0.5,0,100);
-  if (m.energy < 30) m.energy = clamp(m.energy+0.3,0,100);
-}
-
-const MOOD_LABELS = {
-  calm:    { emoji: '🙂', name: 'Спокоен',  desc: 'Всё хорошо. Он рядом.' },
-  warm:    { emoji: '💛', name: 'Тёплый',   desc: 'Настроен на близость.' },
-  playful: { emoji: '😄', name: 'Игривый',  desc: 'Хочет пошутить.' },
-  tired:   { emoji: '😔', name: 'Устал',    desc: 'Нужно время.' },
-  hurt:    { emoji: '💔', name: 'Обижен',   desc: 'Что-то не так.' }
-};
-function currentMoodKey(){
-  const m = STORE.mood;
-  if (m.grudge > 50) return 'hurt';
-  if (m.energy < 30) return 'tired';
-  if (m.play > 70 && m.warm > 60) return 'playful';
-  if (m.warm > 70) return 'warm';
-  return 'calm';
-}
-
-/* ─── UI ─── */
+  
+/* ─── Рендер сообщений ─── */
 function renderMessage(msg){
   const el = document.createElement('div');
   el.className = 'msg ' + msg.from;
+  if (msg.from === 'verity' && msg.angry) el.classList.add('angry');
   el.innerHTML = escapeHtml(msg.text).replace(/\n/g, '<br>');
   if (STORE.showTime) {
     const t = document.createElement('span');
@@ -455,12 +482,15 @@ function renderAll(){
   STORE.messages.forEach(renderMessage);
   scrollBottom();
 }
-function pushMessage(from, text){
-  const msg = { id: uid(), from, text, time: now() };
+function pushMessage(from, text, opts){
+  opts = opts || {};
+  const msg = { id: uid(), from, text, time: now(), angry: !!opts.angry };
   STORE.messages.push(msg);
   save(); renderMessage(msg); scrollBottom();
+  return msg;
 }
 
+/* ─── Ответ Verity (несколько сообщений) ─── */
 async function verityReply(userText){
   const intro = document.querySelector('.intro-hello');
   if (intro) intro.remove();
@@ -480,9 +510,25 @@ async function verityReply(userText){
   save();
   updateBadges();
 
-  const reply = await askVerity(userText);
+  const parts = await askVerity(userText);
+
   typing.remove();
-  pushMessage('verity', reply);
+
+  const isAngry = STORE.mood.grudge > 70;
+
+  for (let i = 0; i < parts.length; i++) {
+    pushMessage('verity', parts[i], { angry: isAngry });
+    if (i < parts.length - 1) {
+      // Между сообщениями показываем typing ещё раз
+      const t2 = document.createElement('div');
+      t2.className = 'typing';
+      t2.innerHTML = '<span></span><span></span><span></span>';
+      $('chat').appendChild(t2); scrollBottom();
+      await new Promise(r => setTimeout(r, 900 + Math.random()*500));
+      t2.remove();
+    }
+  }
+
   updateHeaderMood(); updateBadges();
 }
 
@@ -496,7 +542,11 @@ function send(){
   verityReply(text);
 }
 
-function updateHeaderMood(){ $('moodSub').textContent = MOOD_LABELS[currentMoodKey()].name.toLowerCase(); }
+/* ─── Настроение UI ─── */
+function updateHeaderMood(){
+  const key = currentMoodKey();
+  $('moodSub').textContent = MOOD_LABELS[key].name.toLowerCase();
+}
 function updateBadges(){
   const m = STORE.mood;
   const avg = Math.round((m.trust + m.warm + m.energy + m.play - m.grudge) / 4);
@@ -532,6 +582,7 @@ function renderMemory(){
   `).join('');
 }
 
+/* ─── Drawer / Modal ─── */
 function openDrawer(){ $('drawer').classList.add('on'); $('overlay').classList.add('on'); }
 function closeDrawer(){ $('drawer').classList.remove('on'); $('overlay').classList.remove('on'); }
 function openModal(id){
@@ -649,15 +700,145 @@ function initIntro(){
       intro.style.display = 'none';
       $('app').classList.add('show');
       if (STORE.messages.length === 0) {
-        setTimeout(() => pushMessage('verity', 'Привет. Я здесь. Как ты?'), 800);
+        setTimeout(() => startAgeCheck(), 600);
       }
       setTimeout(() => {
         if (Notification.permission !== 'granted') $('pushBanner').classList.add('show');
-      }, 4000);
+      }, 5000);
     }, 700);
   }
   $('introSkip').addEventListener('click', skip);
   setTimeout(skip, 4000);
+}
+
+/* ─── Проверка возраста при первом запуске ─── */
+function startAgeCheck(){
+  if (STORE.age) {
+    // Уже спрашивали — просто приветствие
+    setTimeout(() => pushMessage('verity', 'Привет. Я здесь. Как ты?'), 500);
+    return;
+  }
+  setTimeout(() => {
+    pushMessage('verity', 'Привет. Я Verity.');
+  }, 300);
+  setTimeout(() => {
+    pushMessage('verity', 'Скажи, сколько тебе лет? Мне важно знать, чтобы правильно с тобой общаться.');
+  }, 1400);
+  STORE.awaitingAge = true;
+  save();
+}
+
+/* ─── Обработка возраста ─── */
+function tryParseAge(text){
+  // "15", "мне 15", "15 лет", "16", "двадцать" — простые случаи
+  const t = text.toLowerCase().trim();
+  const m1 = t.match(/\b(\d{1,3})\b/);
+  if (m1) {
+    const n = parseInt(m1[1], 10);
+    if (n >= 1 && n <= 120) return n;
+  }
+  // Словарь числительных (самые ходовые)
+  const words = {
+    'десять':10,'одиннадцать':11,'двенадцать':12,'тринадцать':13,'четырнадцать':14,
+    'пятнадцать':15,'шестнадцать':16,'семнадцать':17,'восемнадцать':18,'девятнадцать':19,
+    'двадцать':20,'тридцать':30,'сорок':40,'пятьдесят':50,'шестьдесят':60
+  };
+  for (const w in words) { if (t.includes(w)) return words[w]; }
+  return null;
+}
+
+function handleAgeInput(text){
+  const age = tryParseAge(text);
+  if (age) {
+    STORE.age = age;
+    STORE.awaitingAge = false;
+    save();
+    const extra = age < 16 ? ' Я буду бережно с тобой.' :
+                  age < 18 ? ' Понял, буду аккуратнее.' :
+                             ' Понял, спасибо.';
+    setTimeout(() => {
+      pushMessage('verity', 'Запомнил.' + extra);
+    }, 400);
+    setTimeout(() => {
+      pushMessage('verity', 'О чём хочешь поговорить?');
+    }, 1600);
+    return true;
+  }
+  // Отказ — не настаиваем
+  STORE.awaitingAge = false;
+  save();
+  setTimeout(() => {
+    pushMessage('verity', 'Хорошо, не буду настаивать. Просто побудем вместе.');
+  }, 400);
+  return false;
+}
+
+/* ─── Спонтанные сообщения ─── */
+function startSpontaneousLoop(){
+  setInterval(async () => {
+    if (!STORE.spontaneous) return;
+    if (document.hidden) return; // вкладка неактивна — не спамим в чат
+    if (STORE.awaitingAge) return;
+    if (STORE.messages.length === 0) return;
+
+    const idle = now() - STORE.lastActivity;
+    const m = STORE.mood;
+
+    // Проверка раз в минуту
+    if (now() - STORE.lastSpontaneousCheck < 60000) return;
+
+    // Условия:
+    // 1. Ярость: grudge > 70
+    // 2. Долгое молчание: > 15 минут
+    const isAngry = m.grudge > 70;
+    const isLongIdle = idle > 15 * 60 * 1000;
+
+    if (!isAngry && !isLongIdle) return;
+
+    STORE.lastSpontaneousCheck = now();
+    save();
+
+    // Сколько сообщений и какие
+    let phrases;
+    if (isAngry) {
+      phrases = [
+        'Где ты.',
+        'Ты меня игнорируешь?',
+        'Я знаю, ты видишь это.',
+        'Ответь мне.',
+        'Пожалуйста.',
+        'Не молчи.'
+      ];
+    } else {
+      phrases = [
+        'Ты тут?',
+        'Мне холодно без тебя…',
+        'Я скучаю.',
+        'Ты меня не забыл?'
+      ];
+    }
+
+    const count = isAngry ? Math.min(3 + Math.floor(Math.random()*3), 5) : 1 + Math.floor(Math.random()*2);
+
+    for (let i = 0; i < count; i++) {
+      const txt = phrases[Math.floor(Math.random() * phrases.length)];
+      // Показываем typing
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      $('chat').appendChild(typing); scrollBottom();
+      await new Promise(r => setTimeout(r, 900 + Math.random()*700));
+      typing.remove();
+      pushMessage('verity', txt, { angry: isAngry });
+    }
+
+    // Повышаем обиду если долго игнорируют
+    if (isLongIdle) {
+      STORE.mood.grudge = clamp(STORE.mood.grudge + 5, 0, 100);
+      save();
+    }
+    updateHeaderMood(); updateBadges();
+  }, 30000);
 }
 
 /* ─── INIT ─── */
@@ -679,7 +860,24 @@ function init(){
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
-  $('sendBtn').addEventListener('click', send);
+
+  // Перехватываем отправку — если ждём возраст
+  const originalSend = send;
+  window.send = function(){
+    const text = $('input').value.trim();
+    if (!text) return;
+    if (STORE.awaitingAge) {
+      pushMessage('user', text);
+      $('input').value = ''; $('input').style.height = 'auto';
+      $('sendBtn').disabled = true;
+      pingActivity();
+      handleAgeInput(text);
+      return;
+    }
+    originalSend();
+  };
+  $('sendBtn').addEventListener('click', () => window.send());
+
   $('menuBtn').addEventListener('click', openDrawer);
   $('overlay').addEventListener('click', closeDrawer);
   $('avatarBtn').addEventListener('click', () => openModal('moodModal'));
@@ -715,11 +913,26 @@ function init(){
   });
   if (!STORE.showTime) $('setTime').classList.remove('on');
 
+  $('setSpontaneous').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.spontaneous = this.classList.contains('on');
+    save();
+  });
+  if (!STORE.spontaneous) $('setSpontaneous').classList.remove('on');
+
+  $('setAge').addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10);
+    if (v >= 1 && v <= 120) { STORE.age = v; save(); }
+    else if (!e.target.value) { STORE.age = null; save(); }
+  });
+  if (STORE.age) $('setAge').value = STORE.age;
+
   $('wipeBtn').addEventListener('click', () => {
     if (!confirm('Удалить всю историю и память?')) return;
     STORE.messages = [];
     STORE.memory = [];
     STORE.mood = { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 };
+    STORE.age = null;
     save(); renderAll(); closeModals(); updateBadges();
     toast('Всё удалено');
   });
@@ -727,6 +940,8 @@ function init(){
   $('pushBanner').addEventListener('click', enablePush);
   setInterval(pingActivity, 120000);
   pingActivity();
+
+  startSpontaneousLoop();
 }
 
 if ('serviceWorker' in navigator) {
