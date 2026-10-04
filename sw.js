@@ -1,25 +1,50 @@
-const CACHE_NAME = 'verity-v1';
-const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+/* Verity Service Worker — обработка пушей */
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS).catch(() => {})));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  e.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', e => {
-  // Не кэшируем запросы к API — они всегда должны идти в сеть
-  if (e.request.url.includes('/api/ai/chat')) return;
+/* Приём пуш-уведомлений */
+self.addEventListener('push', event => {
+  let data = { title: 'Verity', body: 'Я тут. Жду тебя.' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch(e) {
+    if (event.data) data.body = event.data.text();
+  }
 
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Verity', {
+      body: data.body || '',
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      vibrate: [200, 100, 200],
+      tag: 'verity-message',
+      renotify: true
+    })
   );
+});
+
+/* Клик по уведомлению — открыть сайт */
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url.includes('Verity') && 'focus' in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
+    })
+  );
+});
+
+/* Не кэшируем API — всегда свежие данные */
+self.addEventListener('fetch', event => {
+  if (event.request.url.includes('/api/ai/chat')) return;
+  if (event.request.url.includes('/subscribe')) return;
+  if (event.request.url.includes('/ping')) return;
 });
