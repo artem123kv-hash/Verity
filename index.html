@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#d4af37">
+<meta name="description" content="Verity — друг, который помнит">
+<link rel="manifest" href="manifest.json">
+<title>Verity — друг, который помнит</title>
+<style>
+:root{
+  --gold-1:#f6e6a8; --gold-2:#d4af37; --gold-3:#8f6f1a;
+  --bg-1:#050505; --bg-2:#0d0d0d;
+  --txt-1:#e8e6e1; --txt-2:#8a8a8a; --txt-3:#5c5c5c;
+  --card-bg-1:rgba(23,23,23,.92); --card-bg-2:rgba(18,18,18,.92);
+  --card-border:#2a2a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;overscroll-behavior:none;position:fixed;inset:0}
+
+#bgLayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:
+    radial-gradient(900px 600px at 15% 10%, color-mix(in srgb, var(--gold-2) 10%, transparent), transparent 60%),
+    radial-gradient(800px 600px at 85% 90%, color-mix(in srgb, var(--gold-2) 8%, transparent), transparent 60%),
+    radial-gradient(600px 500px at 50% 50%, rgba(60,60,60,.35), transparent 70%),
+    linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 45%,var(--bg-1) 100%);
+}
+#bgLayer::before{content:"";position:absolute;inset:-25%;
+  background:conic-gradient(from 0deg at 50% 50%,
+    color-mix(in srgb, var(--gold-2) 14%, transparent), rgba(120,120,120,.10), color-mix(in srgb, var(--gold-2) 6%, transparent),
+    rgba(80,80,80,.12), color-mix(in srgb, var(--gold-2) 14%, transparent));
+  filter:blur(90px);opacity:.65;animation:auroraSpin 50s linear infinite;
+}
+@keyframes auroraSpin{to{transform:rotate(360deg)}}
+#bgLayer::after{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 45%, color-mix(in srgb, var(--bg-1) 80%, transparent) 100%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--gold-2) 2.5%, transparent) 0 1px, transparent 1px 60px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--gold-2) 2.5%, transparent) 0 1px, transparent 1px 60px);
+  pointer-events:none;
+}
+#starsCanvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+#intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity .8s ease}
+#intro.hidden{opacity:0;pointer-events:none;display:none}
+#introCanvas{position:absolute;inset:0;z-index:1}
+.intro-logo{font-size:clamp(3rem,15vw,6rem);font-weight:900;letter-spacing:.3em;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 80px rgba(212,175,55,.6);z-index:2;opacity:0;animation:introLogoIn 1.6s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes introLogoIn{0%{opacity:0;transform:scale(.3) rotate(-15deg)}60%{opacity:1;transform:scale(1.15) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.intro-sub{margin-top:24px;font-size:clamp(.9rem,3vw,1.2rem);color:#8a8a8a;letter-spacing:.3em;text-transform:uppercase;z-index:2;opacity:0;animation:introSubIn 1.2s ease 1.2s forwards}
+.intro-sub b{color:var(--gold-2)}
+@keyframes introSubIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.intro-skip{position:absolute;top:calc(20px + env(safe-area-inset-top));right:calc(20px + env(safe-area-inset-right));z-index:100;background:rgba(0,0,0,.6);border:1px solid var(--gold-3);color:var(--gold-2);padding:11px 22px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(6px)}
+.intro-skip:active{transform:scale(.97)}
+
+#app{position:relative;z-index:2;display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:720px;margin:0 auto;opacity:0;transition:opacity .6s ease}
+#app.show{opacity:1}
+
+#header{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));background:linear-gradient(180deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.6) 70%,transparent 100%);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,175,55,.15);position:relative;z-index:5}
+#menuBtn{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:var(--bg-2);border:1px solid var(--card-border);color:var(--gold-2);border-radius:10px;padding:8px 12px;cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+#menuBtn .bars{display:flex;flex-direction:column;gap:3px}
+#menuBtn .bars span{display:block;width:14px;height:2px;background:var(--gold-2);border-radius:2px}
+#menuBtn:active{transform:scale(.97)}
+#headerCenter{flex:1;min-width:0;text-align:center}
+#logoText{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#moodSub{font-size:.66rem;color:var(--txt-2);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+#avatarBtn{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--gold-1),var(--gold-2),var(--gold-3));border:2px solid var(--gold-2);display:grid;place-items:center;font-size:1.3rem;color:#0a0a0a;cursor:pointer;box-shadow:0 0 20px rgba(212,175,55,.5);position:relative}
+#avatarBtn::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--gold-2);opacity:.4;animation:avatarRing 3s ease-in-out infinite}
+@keyframes avatarRing{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.1);opacity:.15}}
+
+#chat{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+#chat::-webkit-scrollbar{width:4px}
+#chat::-webkit-scrollbar-thumb{background:var(--gold-2);border-radius:2px;opacity:.3}
+
+.intro-hello{text-align:center;padding:60px 20px;animation:fadeIn .8s ease}
+.intro-hello .ic{font-size:3rem;display:block;margin-bottom:20px;filter:drop-shadow(0 0 20px rgba(212,175,55,.6))}
+.intro-hello .title{font-size:1.3rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1),var(--gold-2) 45%,var(--gold-3));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:16px}
+.intro-hello .text{color:var(--txt-2);font-size:.9rem;line-height:1.7;max-width:380px;margin:0 auto}
+.intro-hello .text b{color:var(--gold-2)}
+
+.msg{max-width:80%;padding:12px 16px;border-radius:16px;font-size:.95rem;line-height:1.5;word-wrap:break-word;animation:msgIn .4s cubic-bezier(.2,1,.4,1);position:relative}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.msg.verity{align-self:flex-start;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-bottom-left-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.msg.user{align-self:flex-end;background:linear-gradient(180deg,rgba(212,175,55,.25),rgba(212,175,55,.1));border:1px solid color-mix(in srgb,var(--gold-2) 50%,transparent);border-bottom-right-radius:6px;box-shadow:0 4px 16px rgba(212,175,55,.15)}
+.msg .time{font-size:.62rem;color:var(--txt-3);margin-top:4px;display:block;text-align:right}
+
+.typing{align-self:flex-start;padding:14px 18px;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-radius:16px;border-bottom-left-radius:6px;display:flex;gap:5px;align-items:center}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--gold-2);animation:dotPulse 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+#inputWrap{flex:0 0 auto;padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(5,5,5,.95) 0%,rgba(5,5,5,.7) 70%,transparent 100%);backdrop-filter:blur(12px);border-top:1px solid rgba(212,175,55,.15)}
+#inputRow{display:flex;gap:10px;align-items:flex-end;background:var(--bg-2);border:1px solid var(--card-border);border-radius:24px;padding:6px 6px 6px 18px;transition:.2s}
+#inputRow:focus-within{border-color:var(--gold-2);box-shadow:0 0 0 3px rgba(212,175,55,.14)}
+#input{flex:1;background:transparent;border:none;outline:none;color:var(--txt-1);font-family:inherit;font-size:16px;resize:none;max-height:120px;min-height:24px;padding:8px 0;line-height:1.4}
+#input::placeholder{color:var(--txt-3)}
+#sendBtn{flex:0 0 auto;width:42px;height:42px;border-radius:50%;background:linear-gradient(180deg,var(--gold-1),var(--gold-2),var(--gold-3));border:none;color:#0a0a0a;cursor:pointer;font-size:1.2rem;font-weight:900;display:grid;place-items:center;box-shadow:0 4px 15px rgba(212,175,55,.5)}
+#sendBtn:active{transform:scale(.9)}
+#sendBtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:100}
+#overlay.on{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:85vw;z-index:101;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border-right:1px solid color-mix(in srgb,var(--gold-2) 20%,transparent);transform:translateX(-102%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding:22px 18px;padding-top:calc(22px + env(safe-area-inset-top));padding-bottom:calc(22px + env(safe-area-inset-bottom));overflow-y:auto}
+#drawer.on{transform:translateX(0)}
+#drawer h3{color:var(--gold-2);font-size:1rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+#drawer .sub{color:var(--txt-3);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;margin:18px 0 8px}
+.menu-item{display:flex;align-items:center;gap:12px;width:100%;background:transparent;border:1px solid transparent;border-radius:10px;color:var(--txt-1);text-align:left;padding:12px 14px;cursor:pointer;font-family:inherit;font-size:.92rem;transition:.2s}
+.menu-item:hover{background:color-mix(in srgb,var(--gold-2) 8%,transparent);transform:translateX(4px)}
+.menu-item .badge-count{margin-left:auto;font-size:.65rem;font-weight:800;background:color-mix(in srgb,var(--gold-2) 15%,transparent);color:var(--gold-2);padding:2px 8px;border-radius:10px}
+
+.modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.94);backdrop-filter:blur(10px)}
+.modal.on{display:flex;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.modal-box{max-width:560px;width:100%;max-height:90vh;overflow-y:auto;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--gold-2) 40%,transparent);border-radius:18px;padding:24px 22px;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:transparent;border:1px solid var(--card-border);color:var(--txt-2);width:34px;height:34px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:1.1rem}
+.modal-title{font-size:clamp(1.3rem,5vw,1.7rem);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1),var(--gold-2) 45%,var(--gold-3));-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;margin-bottom:6px}
+.modal-sub{text-align:center;color:var(--txt-2);font-size:.78rem;letter-spacing:.08em;margin-bottom:20px}
+
+.mood-card{background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.3));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-radius:16px;padding:22px;text-align:center;margin-bottom:18px}
+.mood-card .mood-big{font-size:3.5rem;line-height:1;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(212,175,55,.6))}
+.mood-card .mood-name{font-size:1.3rem;font-weight:800;color:var(--gold-2);margin-bottom:6px}
+.mood-card .mood-desc{font-size:.82rem;color:var(--txt-2)}
+
+.stat-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.stat-row:last-child{border-bottom:none}
+.stat-ic{width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;font-size:1.15rem;background:rgba(212,175,55,.08);border:1px solid color-mix(in srgb,var(--gold-2) 20%,transparent);border-radius:9px}
+.stat-info{flex:1;min-width:0}
+.stat-lbl{font-size:.7rem;color:var(--txt-2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.stat-bar{height:7px;background:rgba(0,0,0,.5);border-radius:4px;overflow:hidden}
+.stat-fill{height:100%;background:linear-gradient(90deg,var(--gold-3),var(--gold-2),var(--gold-1));border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.stat-val{flex:0 0 auto;font-size:.85rem;font-weight:800;color:var(--gold-2);min-width:34px;text-align:right}
+
+.mem-item{background:rgba(0,0,0,.4);border:1px solid color-mix(in srgb,var(--gold-2) 20%,transparent);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.mem-ic{font-size:1.3rem;flex:0 0 auto}
+.mem-txt{flex:1;font-size:.9rem;line-height:1.4}
+.mem-date{font-size:.66rem;color:var(--txt-3);margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+.mem-empty{text-align:center;color:var(--txt-3);font-size:.85rem;padding:40px 20px;font-style:italic;line-height:1.6}
+.mem-empty b{color:var(--gold-2);font-style:normal}
+
+.set-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--card-border);gap:14px}
+.set-row:last-child{border-bottom:none}
+.set-title{font-size:.9rem;font-weight:600}
+.set-desc{font-size:.72rem;color:var(--txt-3);margin-top:2px}
+.set-input{background:var(--bg-2);border:1px solid var(--card-border);color:var(--gold-2);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:.85rem;width:130px;outline:none;font-weight:700}
+.switch{position:relative;width:48px;height:26px;flex:0 0 auto;border-radius:20px;background:var(--bg-2);border:1px solid var(--card-border);cursor:pointer;transition:.3s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--txt-3);transition:.3s}
+.switch.on{background:rgba(212,175,55,.2);border-color:var(--gold-2)}
+.switch.on::after{left:24px;background:var(--gold-2)}
+
+.btn{display:inline-block;border:1px solid var(--gold-3);background:color-mix(in srgb,var(--gold-2) 10%,transparent);color:var(--gold-2);font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 22px;border-radius:10px;cursor:pointer;font-family:inherit;text-align:center}
+.btn.danger{border-color:#7a2b2b;color:#e06a6a;background:rgba(224,106,106,.08)}
+
+#fab{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));z-index:50;width:48px;height:48px;border-radius:50%;background:linear-gradient(180deg,var(--gold-1),var(--gold-2),var(--gold-3));border:none;color:#0a0a0a;font-size:1.2rem;font-weight:900;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 24px rgba(212,175,55,.5)}
+#fab.on{display:flex}
+
+#toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:linear-gradient(180deg,rgba(30,25,10,.98),rgba(20,18,8,.98));border:1px solid var(--gold-2);color:var(--gold-2);padding:12px 22px;border-radius:10px;font-size:.85rem;font-weight:700;opacity:0;pointer-events:none;transition:.3s;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 8px 30px rgba(212,175,55,.3)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+#pwaBtn{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(120px);z-index:9999;background:linear-gradient(135deg,var(--gold-1),var(--gold-2),var(--gold-3));color:#0a0a0a;border:2px solid var(--gold-1);border-radius:14px;padding:12px 24px;font-family:inherit;font-size:.85rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 30px rgba(212,175,55,.6);transition:transform .4s cubic-bezier(.5,1.5,.5,1),opacity .3s ease;opacity:0;pointer-events:none}
+#pwaBtn.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+
+<div id="bgLayer"></div>
+<canvas id="starsCanvas"></canvas>
+
+<div id="intro">
+  <canvas id="introCanvas"></canvas>
+  <div class="intro-logo">VERITY</div>
+  <div class="intro-sub">друг, который <b>помнит</b></div>
+  <button class="intro-skip" id="introSkip" type="button">Пропустить »</button>
+</div>
+
+<div id="app">
+  <header id="header">
+    <button id="menuBtn" type="button">
+      <span class="bars"><span></span><span></span><span></span></span>
+      <span>Меню</span>
+    </button>
+    <div id="headerCenter">
+      <div id="logoText">Verity</div>
+      <div id="moodSub">слушает</div>
+    </div>
+    <button id="avatarBtn" type="button" aria-label="Аватар">✦</button>
+  </header>
+
+  <main id="chat"></main>
+
+  <div id="inputWrap">
+    <div id="inputRow">
+      <textarea id="input" rows="1" placeholder="Напиши что-нибудь..." maxlength="500"></textarea>
+      <button id="sendBtn" type="button" aria-label="Отправить">↑</button>
+    </div>
+  </div>
+</div>
+
+<button id="fab" type="button" aria-label="Вниз">↓</button>
+
+<div id="overlay"></div>
+<aside id="drawer">
+  <h3>Verity</h3>
+  <div style="color:var(--txt-2);font-size:.8rem;line-height:1.5;">Друг, который помнит</div>
+
+  <div class="sub">Навигация</div>
+  <button class="menu-item" id="miMood" type="button"><span>💫</span><span>Настроение</span><span class="badge-count" id="moodBadge">50</span></button>
+  <button class="menu-item" id="miMemory" type="button"><span>📖</span><span>Память Verity</span><span class="badge-count" id="memBadge">0</span></button>
+  <button class="menu-item" id="miSettings" type="button"><span>⚙️</span><span>Настройки</span></button>
+  <button class="menu-item" id="miAbout" type="button"><span>ℹ️</span><span>О приложении</span></button>
+
+  <div class="sub">Действия</div>
+  <button class="menu-item" id="miNewChat" type="button"><span>🔄</span><span>Новый диалог</span></button>
+  <button class="menu-item" id="miExport" type="button"><span>📤</span><span>Экспорт диалога</span></button>
+
+  <div style="margin-top:auto;padding-top:20px;text-align:center;color:var(--txt-3);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;line-height:1.8;">
+    Verity · Beta 0.4<br>
+    <span style="opacity:.6;">умный друг</span>
+  </div>
+</aside>
+
+<div class="modal" id="moodModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">Настроение</div>
+    <div class="modal-sub">Состояние Verity сейчас</div>
+    <div class="mood-card">
+      <div class="mood-big" id="moodEmoji">🙂</div>
+      <div class="mood-name" id="moodTitle">Спокоен</div>
+      <div class="mood-desc" id="moodDesc">Всё хорошо. Он рядом.</div>
+    </div>
+    <div class="stat-row"><div class="stat-ic">🤝</div><div class="stat-info"><div class="stat-lbl">Доверие</div><div class="stat-bar"><div class="stat-fill" id="barTrust"></div></div></div><div class="stat-val" id="valTrust">50</div></div>
+    <div class="stat-row"><div class="stat-ic">💛</div><div class="stat-info"><div class="stat-lbl">Теплота</div><div class="stat-bar"><div class="stat-fill" id="barWarm"></div></div></div><div class="stat-val" id="valWarm">50</div></div>
+    <div class="stat-row"><div class="stat-ic">⚡</div><div class="stat-info"><div class="stat-lbl">Энергия</div><div class="stat-bar"><div class="stat-fill" id="barEnergy"></div></div></div><div class="stat-val" id="valEnergy">70</div></div>
+    <div class="stat-row"><div class="stat-ic">😄</div><div class="stat-info"><div class="stat-lbl">Игривость</div><div class="stat-bar"><div class="stat-fill" id="barPlay"></div></div></div><div class="stat-val" id="valPlay">50</div></div>
+    <div class="stat-row"><div class="stat-ic">😔</div><div class="stat-info"><div class="stat-lbl">Обида</div><div class="stat-bar"><div class="stat-fill" id="barGrudge"></div></div></div><div class="stat-val" id="valGrudge">0</div></div>
+  </div>
+</div>
+
+<div class="modal" id="memoryModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">📖 Память Verity</div>
+    <div class="modal-sub">Что он запомнил о тебе</div>
+    <div id="memoryBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">⚙️ Настройки</div>
+    <div class="modal-sub">Verity Beta 0.4</div>
+    <div class="set-row"><div><div class="set-title">Имя Verity</div><div class="set-desc">Как он себя называет</div></div><input type="text" class="set-input" id="setName" value="Verity" maxlength="20"></div>
+    <div class="set-row"><div><div class="set-title">Показывать время</div><div class="set-desc">В сообщениях</div></div><div class="switch on" id="setTime"></div></div>
+    <div class="set-row"><div><div class="set-title">Удалить всё</div><div class="set-desc">История + память</div></div><button class="btn danger" id="wipeBtn" type="button">Удалить</button></div>
+  </div>
+</div>
+
+<div class="modal" id="aboutModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">О Verity</div>
+    <div class="modal-sub">Друг, который помнит</div>
+    <div style="color:var(--txt-2);font-size:.9rem;line-height:1.7;">
+      <b style="color:var(--gold-2);">Verity</b> — виртуальный друг на базе Llama 3.3 70B. Он <b>слушает</b>, <b>запоминает</b> и <b>меняется</b> от твоего общения.
+    </div>
+    <div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid var(--card-border);color:var(--txt-3);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;">
+      Автор · Артем Колыбельский<br>
+      <span style="opacity:.6;">Beta 0.4 · 2026</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<button id="pwaBtn" type="button">📱 Установить Verity</button>
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+const now = () => Date.now();
+const fmtTime = ts => { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+const uid = () => now().toString(36) + Math.random().toString(36).slice(2,7);
+const escapeHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const API_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/api/ai/chat';
+const API_TIMEOUT = 60000;
+const HISTORY_LIMIT = 5;
+
+const STORE_KEY = 'verity_v1';
+let STORE = {
+  messages: [],
+  mood: { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 },
+  memory: [],
+  lastSeen: now(),
+  verityName: 'Verity',
+  showTime: true,
+  createdAt: now()
+};
+function save(){ try{ STORE.lastSeen = now(); localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }catch(e){} }
+function load(){ try{ const r = localStorage.getItem(STORE_KEY); if(r) STORE = Object.assign(STORE, JSON.parse(r)); }catch(e){} }
+
+const FALLBACK = {
+  sad: ['Расскажи, что случилось. Я тут.', 'Слышу тебя. Это тяжко.', 'Хочешь поговорить об этом?', 'Я рядом. Просто помни.', 'Ты не один.', 'Обнимаю. Крепко.', 'Ты справишься. Я верю.'],
+  happy: ['Класс! Расскажи подробнее!', 'Это радует. Правда.', 'Отличные новости!', 'Так держать!', 'Рад за тебя.', 'Улыбаюсь.'],
+  angry: ['Я понимаю, почему злишься.', 'Не торопись. Дыши.', 'Давай разберём, что не так.', 'Злиться — нормально.', 'Расскажи, что бесит.', 'Дыши глубже. Я рядом.'],
+  tired: ['Ты много сегодня сделал.', 'Полежи. Мир подождёт.', 'Отдохни. Я никуда не денусь.', 'Может, чай?', 'Спи. Завтра будет легче.', 'Ты имеешь право на отдых.'],
+  question: ['Интересный вопрос. Что ты сам думаешь?', 'Хм. Давай вместе подумаем.', 'Не уверен. А как ты считаешь?', 'Хороший вопрос, не простой.', 'Расскажи, почему спрашиваешь.'],
+  neutral: ['Расскажи ещё.', 'Понимаю.', 'Хм. Интересно.', 'Я слушаю.', 'Как ты сейчас?', 'Продолжай.', 'Понял.', 'Рассказывай дальше.'],
+  greeting: ['Привет! Как ты?', 'Привет. Рад тебя видеть.', 'Хэй. Как дела?'],
+  farewell: ['Пока. Возвращайся.', 'До связи. Я тут.', 'Хорошего дня. Буду ждать.'],
+  gratitude: ['Всегда рад.', 'Не за что.', 'Обращайся.', 'Приятно помочь.'],
+  apology: ['Всё хорошо.', 'Ничего страшного.', 'Забыли.', 'Я не обижаюсь.']
+};
+
+function analyzeIntent(text){
+  const t = text.toLowerCase();
+  return {
+    isGreeting: /^(привет|здравств|хай|hi|hello|добрый|доброе|прив|ку)\b/i.test(t.trim()),
+    isFarewell: /^(пока|до свид|прощай|бай|спокойной)/i.test(t.trim()),
+    isSad: /груст|плох|тяжк|плачу|депрес|больно|одинок|нет сил|тоск|уныл/.test(t),
+    isHappy: /рад|класс|отличн|круто|счаст|ура|кайф|супер|офиген|обожаю/.test(t),
+    isAngry: /бесит|злюсь|ненавиж|достал|злит|ярость|раздража/.test(t),
+    isTired: /устал|вымотал|измотан|валюсь|выгор/.test(t),
+    isQuestion: /\?|как ты|что ты|почему|зачем|когда|где|кто/.test(t),
+    isGratitude: /спасибо|благодар|признателен/.test(t),
+    isApology: /извини|прости|сорри|виноват/.test(t)
+  };
+}
+
+function pickFallback(text){
+  const i = analyzeIntent(text);
+  if (i.isGreeting) return rand(FALLBACK.greeting);
+  if (i.isFarewell) return rand(FALLBACK.farewell);
+  if (i.isGratitude) return rand(FALLBACK.gratitude);
+  if (i.isApology) return rand(FALLBACK.apology);
+  if (i.isSad) return rand(FALLBACK.sad);
+  if (i.isHappy) return rand(FALLBACK.happy);
+  if (i.isAngry) return rand(FALLBACK.angry);
+  if (i.isTired) return rand(FALLBACK.tired);
+  if (i.isQuestion) return rand(FALLBACK.question);
+  return rand(FALLBACK.neutral);
+}
+
+function extractMemory(text){
+  const mems = [];
+  const nameM = text.match(/(?:меня зовут|моё имя|зови меня)\s+([А-ЯЁA-Z][а-яёa-z]+)/i);
+  if (nameM) mems.push({ icon: '👤', text: `Тебя зовут ${nameM[1]}` });
+  const ageM = text.match(/\b(мне|у меня)\s+(\d{1,2})\s*(?:лет|года|год)/i);
+  if (ageM && +ageM[2] < 120) mems.push({ icon: '🎂', text: `Тебе ${ageM[2]} лет` });
+  const loveM = text.match(/(?:я люблю|обожаю|мне нравится)\s+([а-яёa-z\s\-]{3,30})/i);
+  if (loveM) mems.push({ icon: '❤️', text: `Ты любишь ${loveM[1].trim()}` });
+  const cityM = text.match(/(?:я живу в|живу в|я из)\s+([А-ЯЁA-Z][а-яёa-z\-]+)/i);
+  if (cityM) mems.push({ icon: '🏙️', text: `Ты живёшь в ${cityM[1]}` });
+  return mems;
+}
+
+function updateMood(intent){
+  const m = STORE.mood;
+  if (intent.isHappy) { m.trust = clamp(m.trust+3,0,100); m.warm = clamp(m.warm+5,0,100); m.energy = clamp(m.energy+2,0,100); m.grudge = clamp(m.grudge-3,0,100); }
+  if (intent.isSad)   { m.warm = clamp(m.warm+2,0,100); m.energy = clamp(m.energy-3,0,100); }
+  if (intent.isAngry) { m.grudge = clamp(m.grudge+15,0,100); m.trust = clamp(m.trust-8,0,100); m.warm = clamp(m.warm-5,0,100); }
+  if (intent.isTired) { m.energy = clamp(m.energy-5,0,100); }
+  if (intent.isQuestion) { m.trust = clamp(m.trust+2,0,100); }
+  if (intent.isGratitude){ m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-10,0,100); }
+  if (intent.isGreeting){ m.warm = clamp(m.warm+2,0,100); }
+  if (intent.isApology){ m.grudge = clamp(m.grudge-15,0,100); m.trust = clamp(m.trust+3,0,100); }
+  m.grudge = clamp(m.grudge-0.5,0,100);
+  if (m.energy < 30) m.energy = clamp(m.energy+0.3,0,100);
+}
+
+/* ─── API-ЗАПРОС (с историей) ─── */
+async function askVerity(userText){
+  const history = STORE.messages
+    .filter(m => m.from === 'user' || m.from === 'verity')
+    .slice(-HISTORY_LIMIT)
+    .map(m => ({
+      role: m.from === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }));
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: userText,
+        history: history
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const reply = data.reply || data.message || data.content || data.text;
+    if (!reply || typeof reply !== 'string' || !reply.trim()) throw new Error('Пустой ответ');
+
+    console.log('✅ Verity ответил:', reply.slice(0, 80));
+    return reply.trim();
+
+  } catch (e) {
+    clearTimeout(timer);
+    console.warn('⚠ API:', e.message);
+    return pickFallback(userText);
+  }
+}
+
+function renderMessage(msg){
+  const chat = $('chat');
+  const el = document.createElement('div');
+  el.className = 'msg ' + msg.from;
+  el.innerHTML = escapeHtml(msg.text).replace(/\n/g, '<br>');
+  if (STORE.showTime) {
+    const t = document.createElement('span');
+    t.className = 'time';
+    t.textContent = fmtTime(msg.time);
+    el.appendChild(t);
+  }
+  chat.appendChild(el);
+}
+function scrollBottom(){ const c = $('chat'); c.scrollTop = c.scrollHeight; }
+function renderAll(){
+  const chat = $('chat'); chat.innerHTML = '';
+  if (STORE.messages.length === 0) {
+    const el = document.createElement('div');
+    el.className = 'intro-hello';
+    el.innerHTML = `<span class="ic">✦</span><div class="title">Привет</div><div class="text">Я <b>Verity</b>. Здесь, чтобы <b>слушать</b>. И <b>помнить</b>.<br><br>Напиши что-нибудь.</div>`;
+    chat.appendChild(el);
+    return;
+  }
+  STORE.messages.forEach(renderMessage);
+  scrollBottom();
+}
+function pushMessage(from, text){
+  const msg = { id: uid(), from, text, time: now() };
+  STORE.messages.push(msg);
+  save(); renderMessage(msg); scrollBottom();
+  return msg;
+}
+
+async function verityReply(userText){
+  const intro = document.querySelector('.intro-hello');
+  if (intro) intro.remove();
+
+  const chat = $('chat');
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(typing); scrollBottom();
+
+  const intent = analyzeIntent(userText);
+  updateMood(intent);
+  extractMemory(userText).forEach(mm => {
+    if (!STORE.memory.some(x => x.text === mm.text)) {
+      STORE.memory.push({ id: uid(), text: mm.text, icon: mm.icon, date: now() });
+    }
+  });
+  save();
+  updateBadges();
+
+  const reply = await askVerity(userText);
+
+  typing.remove();
+  pushMessage('verity', reply);
+  updateHeaderMood(); updateBadges();
+}
+
+function send(){
+  const input = $('input');
+  const text = input.value.trim();
+  if (!text) return;
+  pushMessage('user', text);
+  input.value = ''; input.style.height = 'auto';
+  $('sendBtn').disabled = true;
+  verityReply(text);
+}
+
+const MOOD_LABELS = {
+  calm:    { emoji: '🙂', name: 'Спокоен',  desc: 'Всё хорошо. Он рядом.' },
+  warm:    { emoji: '💛', name: 'Тёплый',   desc: 'Настроен на близость.' },
+  playful: { emoji: '😄', name: 'Игривый',  desc: 'Хочет пошутить.' },
+  tired:   { emoji: '😔', name: 'Устал',    desc: 'Нужно время.' },
+  hurt:    { emoji: '💔', name: 'Обижен',   desc: 'Что-то не так.' }
+};
+function currentMoodKey(){
+  const m = STORE.mood;
+  if (m.grudge > 50) return 'hurt';
+  if (m.energy < 30) return 'tired';
+  if (m.play > 70 && m.warm > 60) return 'playful';
+  if (m.warm > 70) return 'warm';
+  return 'calm';
+}
+function updateHeaderMood(){ $('moodSub').textContent = MOOD_LABELS[currentMoodKey()].name.toLowerCase(); }
+function updateBadges(){
+  const m = STORE.mood;
+  const avg = Math.round((m.trust + m.warm + m.energy + m.play - m.grudge) / 4);
+  $('moodBadge').textContent = Math.max(0, avg);
+  $('memBadge').textContent = STORE.memory.length;
+}
+function updateMoodModal(){
+  const m = STORE.mood;
+  const lbl = MOOD_LABELS[currentMoodKey()];
+  $('moodEmoji').textContent = lbl.emoji;
+  $('moodTitle').textContent = lbl.name;
+  $('moodDesc').textContent = lbl.desc;
+  $('barTrust').style.width = m.trust + '%';   $('valTrust').textContent = Math.round(m.trust);
+  $('barWarm').style.width = m.warm + '%';     $('valWarm').textContent = Math.round(m.warm);
+  $('barEnergy').style.width = m.energy + '%'; $('valEnergy').textContent = Math.round(m.energy);
+  $('barPlay').style.width = m.play + '%';     $('valPlay').textContent = Math.round(m.play);
+  $('barGrudge').style.width = m.grudge + '%'; $('valGrudge').textContent = Math.round(m.grudge);
+}
+function renderMemory(){
+  const body = $('memoryBody');
+  if (STORE.memory.length === 0) {
+    body.innerHTML = '<div class="mem-empty">Verity пока ничего не запомнил.<br><br><b>Расскажи ему о себе.</b></div>';
+    return;
+  }
+  body.innerHTML = STORE.memory.map(m => `
+    <div class="mem-item">
+      <div class="mem-ic">${m.icon}</div>
+      <div style="flex:1;">
+        <div class="mem-txt">${escapeHtml(m.text)}</div>
+        <div class="mem-date">${new Date(m.date).toLocaleDateString('ru-RU')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDrawer(){ $('drawer').classList.add('on'); $('overlay').classList.add('on'); }
+function closeDrawer(){ $('drawer').classList.remove('on'); $('overlay').classList.remove('on'); }
+function openModal(id){
+  closeDrawer();
+  if (id === 'moodModal') updateMoodModal();
+  if (id === 'memoryModal') renderMemory();
+  $(id).classList.add('on');
+}
+function closeModals(){ document.querySelectorAll('.modal').forEach(m => m.classList.remove('on')); }
+
+function initStars(){
+  const canvas = $('starsCanvas'), ctx = canvas.getContext('2d');
+  let stars = [];
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = window.innerWidth, h = window.innerHeight;
+    stars = [];
+    for (let i = 0; i < Math.min(60, Math.floor(w*h/25000)); i++) {
+      stars.push({ x: Math.random()*w, y: Math.random()*h, r: 0.5+Math.random()*1.5, vy: 0.05+Math.random()*0.15, alpha: 0.2+Math.random()*0.5, twinkle: Math.random()*Math.PI*2, color: Math.random()<0.85 ? '#d4af37' : '#f6e6a8' });
+    }
+  }
+  function loop(){
+    const w = window.innerWidth, h = window.innerHeight;
+    ctx.clearRect(0, 0, w, h);
+    stars.forEach(s => {
+      s.twinkle += 0.02; s.y += s.vy;
+      if (s.y > h+5) { s.y = -5; s.x = Math.random()*w; }
+      const a = s.alpha * (0.5 + Math.sin(s.twinkle)*0.5);
+      ctx.beginPath(); ctx.fillStyle = s.color; ctx.globalAlpha = a; ctx.shadowColor = s.color; ctx.shadowBlur = 6;
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    requestAnimationFrame(loop);
+  }
+  resize(); window.addEventListener('resize', resize); requestAnimationFrame(loop);
+}
+
+function initIntro(){
+  const intro = $('intro'), canvas = $('introCanvas'), ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); spawn();
+  }
+  function spawn(){
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    particles = [];
+    for (let i = 0; i < Math.min(80, Math.floor(window.innerWidth * window.innerHeight / 20000)); i++) {
+      const angle = Math.random()*Math.PI*2;
+      const dist = Math.max(window.innerWidth, window.innerHeight) * (0.6 + Math.random()*0.6);
+      particles.push({ x: cx + Math.cos(angle)*dist, y: cy + Math.sin(angle)*dist, size: 1+Math.random()*2.5, angle, dist, speed: 0.012+Math.random()*0.015, color: Math.random()<0.85 ? '#d4af37' : '#f6e6a8', arrived: false });
+    }
+  }
+  function loop(){
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    particles.forEach(p => {
+      if (!p.arrived) {
+        p.dist -= p.dist * p.speed;
+        p.x = cx + Math.cos(p.angle) * p.dist;
+        p.y = cy + Math.sin(p.angle) * p.dist;
+        if (p.dist < 30) { p.arrived = true; p.dist = 30; }
+      } else {
+        p.x = cx + Math.cos(p.angle) * (30 + Math.sin(now()*0.002 + p.angle)*8);
+        p.y = cy + Math.sin(p.angle) * (30 + Math.cos(now()*0.002 + p.angle)*8);
+      }
+      const alpha = p.arrived ? 0.9 : Math.min(1, 1 - p.dist / Math.max(window.innerWidth, window.innerHeight) * 0.6);
+      ctx.beginPath(); ctx.fillStyle = p.color; ctx.globalAlpha = alpha*0.85; ctx.shadowColor = p.color; ctx.shadowBlur = 10;
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    requestAnimationFrame(loop);
+  }
+  resize(); window.addEventListener('resize', resize); requestAnimationFrame(loop);
+
+  let skipped = false;
+  function skip(){
+    if (skipped) return;
+    skipped = true;
+    intro.classList.add('hidden');
+    setTimeout(() => {
+      intro.style.display = 'none';
+      $('app').classList.add('show');
+      if (STORE.messages.length === 0) {
+        setTimeout(() => {
+          pushMessage('verity', 'Привет. Я здесь. Как ты?');
+          updateHeaderMood(); updateBadges();
+        }, 800);
+      }
+    }, 700);
+  }
+  $('introSkip').addEventListener('click', skip);
+  setTimeout(skip, 4000);
+}
+
+function initFab(){
+  const chat = $('chat'), fab = $('fab');
+  chat.addEventListener('scroll', () => {
+    fab.classList.toggle('on', chat.scrollHeight - chat.scrollTop - chat.clientHeight > 200);
+  });
+  fab.addEventListener('click', () => chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' }));
+}
+
+function toast(msg){
+  const el = $('toast'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+function exportDialog(){
+  if (STORE.messages.length === 0) { toast('Диалог пуст'); return; }
+  let txt = `═══ Verity — Диалог ═══\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\nСообщений: ${STORE.messages.length}\nПамять: ${STORE.memory.length}\n\n`;
+  STORE.messages.forEach(m => {
+    txt += `[${fmtTime(m.time)}] ${m.from === 'user' ? 'Ты' : STORE.verityName}: ${m.text}\n`;
+  });
+  if (STORE.memory.length) {
+    txt += `\n═══ Память ═══\n`;
+    STORE.memory.forEach(mm => { txt += `${mm.icon} ${mm.text}\n`; });
+  }
+  try {
+    navigator.clipboard.writeText(txt).then(
+      () => toast('📤 Скопировано'),
+      () => fallbackDownload(txt)
+    );
+  } catch(e) { fallbackDownload(txt); }
+}
+function fallbackDownload(txt){
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `verity_${Date.now()}.txt`; a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 Скачано');
+}
+
+function init(){
+  load();
+  renderAll();
+  updateHeaderMood();
+  updateBadges();
+  initStars();
+  initIntro();
+  initFab();
+
+  const input = $('input');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(120, input.scrollHeight) + 'px';
+    $('sendBtn').disabled = !input.value.trim();
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  $('sendBtn').addEventListener('click', send);
+
+  $('menuBtn').addEventListener('click', openDrawer);
+  $('overlay').addEventListener('click', closeDrawer);
+  $('avatarBtn').addEventListener('click', () => openModal('moodModal'));
+  $('miMood').addEventListener('click', () => openModal('moodModal'));
+  $('miMemory').addEventListener('click', () => openModal('memoryModal'));
+  $('miSettings').addEventListener('click', () => openModal('settingsModal'));
+  $('miAbout').addEventListener('click', () => openModal('aboutModal'));
+
+  $('miNewChat').addEventListener('click', () => {
+    if (!confirm('Начать новый диалог?')) return;
+    STORE.messages = [];
+    save(); renderAll(); closeDrawer(); toast('🔄 Новый диалог');
+    setTimeout(() => {
+      pushMessage('verity', 'Хорошо, начнём заново. Как ты?');
+      updateHeaderMood(); updateBadges();
+    }, 700);
+  });
+  $('miExport').addEventListener('click', () => { closeDrawer(); exportDialog(); });
+
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => {
+    if (e.target === m) closeModals();
+  }));
+
+  $('setName').addEventListener('input', e => {
+    STORE.verityName = e.target.value.trim() || 'Verity';
+    $('logoText').textContent = STORE.verityName;
+    save();
+  });
+  $('setName').value = STORE.verityName;
+  $('logoText').textContent = STORE.verityName;
+
+  $('setTime').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.showTime = this.classList.contains('on');
+    save(); renderAll();
+  });
+  if (!STORE.showTime) $('setTime').classList.remove('on');
+
+  $('wipeBtn').addEventListener('click', () => {
+    if (!confirm('Удалить всю историю и память?')) return;
+    STORE.messages = [];
+    STORE.memory = [];
+    STORE.mood = { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 };
+    save(); renderAll(); closeModals(); updateBadges();
+    toast('Всё удалено');
+  });
+}
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => $('pwaBtn').classList.add('show'), 4000);
+});
+$('pwaBtn').addEventListener('click', () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(c => {
+    if (c.outcome === 'accepted') toast('📱 Verity установлен!');
+    deferredPrompt = null;
+    $('pwaBtn').classList.remove('show');
+  });
+});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
