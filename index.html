@@ -58,6 +58,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 #logoText{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 #moodSub{font-size:.66rem;color:var(--txt-2);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
 #avatarBtn{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--gold-1),var(--gold-2),var(--gold-3));border:2px solid var(--gold-2);display:grid;place-items:center;font-size:1.3rem;color:#0a0a0a;cursor:pointer;box-shadow:0 0 20px rgba(212,175,55,.5);position:relative}
+#avatarBtn::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--gold-2);opacity:.4;animation:avatarRing 3s ease-in-out infinite}
+@keyframes avatarRing{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.1);opacity:.15}}
 
 #chat{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 16px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 #chat::-webkit-scrollbar{width:4px}
@@ -106,10 +108,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 .modal-title{font-size:clamp(1.3rem,5vw,1.7rem);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1),var(--gold-2) 45%,var(--gold-3));-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center;margin-bottom:6px}
 .modal-sub{text-align:center;color:var(--txt-2);font-size:.78rem;letter-spacing:.08em;margin-bottom:20px}
 
+.mood-card{background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.3));border:1px solid color-mix(in srgb,var(--gold-2) 25%,transparent);border-radius:16px;padding:22px;text-align:center;margin-bottom:18px}
+.mood-card .mood-big{font-size:3.5rem;line-height:1;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(212,175,55,.6))}
+.mood-card .mood-name{font-size:1.3rem;font-weight:800;color:var(--gold-2);margin-bottom:6px}
+.mood-card .mood-desc{font-size:.82rem;color:var(--txt-2)}
+
+.stat-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.stat-row:last-child{border-bottom:none}
+.stat-ic{width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;font-size:1.15rem;background:rgba(212,175,55,.08);border:1px solid color-mix(in srgb,var(--gold-2) 20%,transparent);border-radius:9px}
+.stat-info{flex:1;min-width:0}
+.stat-lbl{font-size:.7rem;color:var(--txt-2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.stat-bar{height:7px;background:rgba(0,0,0,.5);border-radius:4px;overflow:hidden}
+.stat-fill{height:100%;background:linear-gradient(90deg,var(--gold-3),var(--gold-2),var(--gold-1));border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.stat-val{flex:0 0 auto;font-size:.85rem;font-weight:800;color:var(--gold-2);min-width:34px;text-align:right}
+
+.mem-item{background:rgba(0,0,0,.4);border:1px solid color-mix(in srgb,var(--gold-2) 20%,transparent);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.mem-ic{font-size:1.3rem;flex:0 0 auto}
+.mem-txt{flex:1;font-size:.9rem;line-height:1.4}
+.mem-date{font-size:.66rem;color:var(--txt-3);margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+.mem-empty{text-align:center;color:var(--txt-3);font-size:.85rem;padding:40px 20px;font-style:italic;line-height:1.6}
+.mem-empty b{color:var(--gold-2);font-style:normal}
+
 .set-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--card-border);gap:14px}
 .set-row:last-child{border-bottom:none}
 .set-title{font-size:.9rem;font-weight:600}
 .set-desc{font-size:.72rem;color:var(--txt-3);margin-top:2px}
+.set-input{background:var(--bg-2);border:1px solid var(--card-border);color:var(--gold-2);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:.85rem;width:130px;outline:none;font-weight:700}
 .switch{position:relative;width:48px;height:26px;flex:0 0 auto;border-radius:20px;background:var(--bg-2);border:1px solid var(--card-border);cursor:pointer;transition:.3s}
 .switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--txt-3);transition:.3s}
 .switch.on{background:rgba(212,175,55,.2);border-color:var(--gold-2)}
@@ -117,7 +141,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 
 .btn{display:inline-block;border:1px solid var(--gold-3);background:color-mix(in srgb,var(--gold-2) 10%,transparent);color:var(--gold-2);font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 22px;border-radius:10px;cursor:pointer;font-family:inherit;text-align:center}
 .btn.danger{border-color:#7a2b2b;color:#e06a6a;background:rgba(224,106,106,.08)}
-.btn.full{width:100%}
 
 #toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:linear-gradient(180deg,rgba(30,25,10,.98),rgba(20,18,8,.98));border:1px solid var(--gold-2);color:var(--gold-2);padding:12px 22px;border-radius:10px;font-size:.85rem;font-weight:700;opacity:0;pointer-events:none;transition:.3s;z-index:9999;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -167,16 +190,59 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <div style="color:var(--txt-2);font-size:.8rem;line-height:1.5;">Друг, который помнит</div>
 
   <div class="sub">Навигация</div>
+  <button class="menu-item" id="miMood" type="button"><span>💫</span><span>Настроение</span><span class="badge-count" id="moodBadge">50</span></button>
+  <button class="menu-item" id="miMemory" type="button"><span>📖</span><span>Память Verity</span><span class="badge-count" id="memBadge">0</span></button>
   <button class="menu-item" id="miPush" type="button"><span>🔔</span><span>Включить уведомления</span></button>
+  <button class="menu-item" id="miSettings" type="button"><span>⚙️</span><span>Настройки</span></button>
+  <button class="menu-item" id="miAbout" type="button"><span>ℹ️</span><span>О приложении</span></button>
+
+  <div class="sub">Действия</div>
   <button class="menu-item" id="miNewChat" type="button"><span>🔄</span><span>Новый диалог</span></button>
   <button class="menu-item" id="miExport" type="button"><span>📤</span><span>Экспорт диалога</span></button>
-  <button class="menu-item" id="miAbout" type="button"><span>ℹ️</span><span>О приложении</span></button>
 
   <div style="margin-top:auto;padding-top:20px;text-align:center;color:var(--txt-3);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;line-height:1.8;">
     Verity · Beta 0.6<br>
     <span style="opacity:.6;">умный друг</span>
   </div>
 </aside>
+
+<div class="modal" id="moodModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">Настроение</div>
+    <div class="modal-sub">Состояние Verity сейчас</div>
+    <div class="mood-card">
+      <div class="mood-big" id="moodEmoji">🙂</div>
+      <div class="mood-name" id="moodTitle">Спокоен</div>
+      <div class="mood-desc" id="moodDesc">Всё хорошо. Он рядом.</div>
+    </div>
+    <div class="stat-row"><div class="stat-ic">🤝</div><div class="stat-info"><div class="stat-lbl">Доверие</div><div class="stat-bar"><div class="stat-fill" id="barTrust"></div></div></div><div class="stat-val" id="valTrust">50</div></div>
+    <div class="stat-row"><div class="stat-ic">💛</div><div class="stat-info"><div class="stat-lbl">Теплота</div><div class="stat-bar"><div class="stat-fill" id="barWarm"></div></div></div><div class="stat-val" id="valWarm">50</div></div>
+    <div class="stat-row"><div class="stat-ic">⚡</div><div class="stat-info"><div class="stat-lbl">Энергия</div><div class="stat-bar"><div class="stat-fill" id="barEnergy"></div></div></div><div class="stat-val" id="valEnergy">70</div></div>
+    <div class="stat-row"><div class="stat-ic">😄</div><div class="stat-info"><div class="stat-lbl">Игривость</div><div class="stat-bar"><div class="stat-fill" id="barPlay"></div></div></div><div class="stat-val" id="valPlay">50</div></div>
+    <div class="stat-row"><div class="stat-ic">😔</div><div class="stat-info"><div class="stat-lbl">Обида</div><div class="stat-bar"><div class="stat-fill" id="barGrudge"></div></div></div><div class="stat-val" id="valGrudge">0</div></div>
+  </div>
+</div>
+
+<div class="modal" id="memoryModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">📖 Память Verity</div>
+    <div class="modal-sub">Что он запомнил о тебе</div>
+    <div id="memoryBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-box">
+    <button class="modal-close" type="button" data-close>×</button>
+    <div class="modal-title">⚙️ Настройки</div>
+    <div class="modal-sub">Verity Beta 0.6</div>
+    <div class="set-row"><div><div class="set-title">Имя Verity</div><div class="set-desc">Как он себя называет</div></div><input type="text" class="set-input" id="setName" value="Verity" maxlength="20"></div>
+    <div class="set-row"><div><div class="set-title">Показывать время</div><div class="set-desc">В сообщениях</div></div><div class="switch on" id="setTime"></div></div>
+    <div class="set-row"><div><div class="set-title">Удалить всё</div><div class="set-desc">История + память</div></div><button class="btn danger" id="wipeBtn" type="button">Удалить</button></div>
+  </div>
+</div>
 
 <div class="modal" id="aboutModal">
   <div class="modal-box">
@@ -200,6 +266,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 'use strict';
 const $ = id => document.getElementById(id);
 const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 const now = () => Date.now();
 const fmtTime = ts => { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
 const uid = () => now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -213,8 +280,10 @@ const VAPID_PUBLIC = "BHAMI-kmZTSVa8w6cRd8pr18MmVG66vknMh8x6kNIDzLDpuOAzMspGkGlx
 const STORE_KEY = 'verity_v2';
 let STORE = {
   messages: [],
-  userId: null,
-  lastSeen: now()
+  mood: { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 },
+  memory: [],
+  verityName: 'Verity',
+  showTime: true
 };
 
 /* ─── userId ─── */
@@ -227,14 +296,8 @@ function initUserId(){
   STORE.userId = id;
 }
 
-/* ─── STORAGE ─── */
-function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify({messages: STORE.messages})); }catch(e){} }
-function load(){
-  try{
-    const r = localStorage.getItem(STORE_KEY);
-    if (r) STORE.messages = JSON.parse(r).messages || [];
-  }catch(e){}
-}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }catch(e){} }
+function load(){ try{ const r = localStorage.getItem(STORE_KEY); if(r) STORE = Object.assign(STORE, JSON.parse(r)); }catch(e){} }
 
 /* ─── API ─── */
 async function askVerity(userText){
@@ -285,16 +348,10 @@ async function enablePush(){
     toast('❌ Уведомления не поддерживаются');
     return false;
   }
-
   try {
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      toast('❌ Уведомления не разрешены');
-      return false;
-    }
-
+    if (permission !== 'granted') { toast('❌ Уведомления не разрешены'); return false; }
     const reg = await navigator.serviceWorker.ready;
-
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {
       sub = await reg.pushManager.subscribe({
@@ -302,16 +359,11 @@ async function enablePush(){
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
       });
     }
-
     const res = await fetch(SUBSCRIBE_URL, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        userId: STORE.userId,
-        subscription: sub.toJSON()
-      })
+      body: JSON.stringify({ userId: STORE.userId, subscription: sub.toJSON() })
     });
-
     if (!res.ok) throw new Error('Subscribe failed');
     toast('✅ Уведомления включены');
     $('pushBanner').classList.remove('show');
@@ -328,15 +380,69 @@ function pingActivity(){
   fetch(PING_URL + '?userId=' + STORE.userId).catch(() => {});
 }
 
+/* ─── Память ─── */
+function extractMemory(text){
+  const mems = [];
+  const nameM = text.match(/(?:меня зовут|моё имя|зови меня)\s+([А-ЯЁA-Z][а-яёa-z]+)/i);
+  if (nameM) mems.push({ icon: '👤', text: `Тебя зовут ${nameM[1]}` });
+  const ageM = text.match(/\b(мне|у меня)\s+(\d{1,2})\s*(?:лет|года|год)/i);
+  if (ageM && +ageM[2] < 120) mems.push({ icon: '🎂', text: `Тебе ${ageM[2]} лет` });
+  const loveM = text.match(/(?:я люблю|обожаю|мне нравится)\s+([а-яёa-z\s\-]{3,30})/i);
+  if (loveM) mems.push({ icon: '❤️', text: `Ты любишь ${loveM[1].trim()}` });
+  return mems;
+}
+
+/* ─── Настроение ─── */
+function analyzeIntent(text){
+  const t = text.toLowerCase();
+  return {
+    isSad: /груст|плох|тяжк|плачу|депрес|больно|одинок|нет сил|тоск|уныл/.test(t),
+    isHappy: /рад|класс|отличн|круто|счаст|ура|кайф|супер|офиген|обожаю/.test(t),
+    isAngry: /бесит|злюсь|ненавиж|достал|злит|ярость|раздража/.test(t),
+    isTired: /устал|вымотал|измотан|валюсь|выгор/.test(t),
+    isGratitude: /спасибо|благодар|признателен/.test(t),
+    isApology: /извини|прости|сорри|виноват/.test(t)
+  };
+}
+function updateMood(intent){
+  const m = STORE.mood;
+  if (intent.isHappy) { m.trust = clamp(m.trust+3,0,100); m.warm = clamp(m.warm+5,0,100); m.energy = clamp(m.energy+2,0,100); m.grudge = clamp(m.grudge-3,0,100); }
+  if (intent.isSad)   { m.warm = clamp(m.warm+2,0,100); m.energy = clamp(m.energy-3,0,100); }
+  if (intent.isAngry) { m.grudge = clamp(m.grudge+15,0,100); m.trust = clamp(m.trust-8,0,100); m.warm = clamp(m.warm-5,0,100); }
+  if (intent.isTired) { m.energy = clamp(m.energy-5,0,100); }
+  if (intent.isGratitude){ m.warm = clamp(m.warm+5,0,100); m.grudge = clamp(m.grudge-10,0,100); }
+  if (intent.isApology){ m.grudge = clamp(m.grudge-15,0,100); m.trust = clamp(m.trust+3,0,100); }
+  m.grudge = clamp(m.grudge-0.5,0,100);
+  if (m.energy < 30) m.energy = clamp(m.energy+0.3,0,100);
+}
+
+const MOOD_LABELS = {
+  calm:    { emoji: '🙂', name: 'Спокоен',  desc: 'Всё хорошо. Он рядом.' },
+  warm:    { emoji: '💛', name: 'Тёплый',   desc: 'Настроен на близость.' },
+  playful: { emoji: '😄', name: 'Игривый',  desc: 'Хочет пошутить.' },
+  tired:   { emoji: '😔', name: 'Устал',    desc: 'Нужно время.' },
+  hurt:    { emoji: '💔', name: 'Обижен',   desc: 'Что-то не так.' }
+};
+function currentMoodKey(){
+  const m = STORE.mood;
+  if (m.grudge > 50) return 'hurt';
+  if (m.energy < 30) return 'tired';
+  if (m.play > 70 && m.warm > 60) return 'playful';
+  if (m.warm > 70) return 'warm';
+  return 'calm';
+}
+
 /* ─── UI ─── */
 function renderMessage(msg){
   const el = document.createElement('div');
   el.className = 'msg ' + msg.from;
   el.innerHTML = escapeHtml(msg.text).replace(/\n/g, '<br>');
-  const t = document.createElement('span');
-  t.className = 'time';
-  t.textContent = fmtTime(msg.time);
-  el.appendChild(t);
+  if (STORE.showTime) {
+    const t = document.createElement('span');
+    t.className = 'time';
+    t.textContent = fmtTime(msg.time);
+    el.appendChild(t);
+  }
   $('chat').appendChild(el);
 }
 function scrollBottom(){ const c = $('chat'); c.scrollTop = c.scrollHeight; }
@@ -364,9 +470,20 @@ async function verityReply(userText){
   typing.innerHTML = '<span></span><span></span><span></span>';
   $('chat').appendChild(typing); scrollBottom();
 
+  const intent = analyzeIntent(userText);
+  updateMood(intent);
+  extractMemory(userText).forEach(mm => {
+    if (!STORE.memory.some(x => x.text === mm.text)) {
+      STORE.memory.push({ id: uid(), text: mm.text, icon: mm.icon, date: now() });
+    }
+  });
+  save();
+  updateBadges();
+
   const reply = await askVerity(userText);
   typing.remove();
   pushMessage('verity', reply);
+  updateHeaderMood(); updateBadges();
 }
 
 function send(){
@@ -379,15 +496,74 @@ function send(){
   verityReply(text);
 }
 
+function updateHeaderMood(){ $('moodSub').textContent = MOOD_LABELS[currentMoodKey()].name.toLowerCase(); }
+function updateBadges(){
+  const m = STORE.mood;
+  const avg = Math.round((m.trust + m.warm + m.energy + m.play - m.grudge) / 4);
+  $('moodBadge').textContent = Math.max(0, avg);
+  $('memBadge').textContent = STORE.memory.length;
+}
+function updateMoodModal(){
+  const m = STORE.mood;
+  const lbl = MOOD_LABELS[currentMoodKey()];
+  $('moodEmoji').textContent = lbl.emoji;
+  $('moodTitle').textContent = lbl.name;
+  $('moodDesc').textContent = lbl.desc;
+  $('barTrust').style.width = m.trust + '%';   $('valTrust').textContent = Math.round(m.trust);
+  $('barWarm').style.width = m.warm + '%';     $('valWarm').textContent = Math.round(m.warm);
+  $('barEnergy').style.width = m.energy + '%'; $('valEnergy').textContent = Math.round(m.energy);
+  $('barPlay').style.width = m.play + '%';     $('valPlay').textContent = Math.round(m.play);
+  $('barGrudge').style.width = m.grudge + '%'; $('valGrudge').textContent = Math.round(m.grudge);
+}
+function renderMemory(){
+  const body = $('memoryBody');
+  if (STORE.memory.length === 0) {
+    body.innerHTML = '<div class="mem-empty">Verity пока ничего не запомнил.<br><br><b>Расскажи ему о себе.</b></div>';
+    return;
+  }
+  body.innerHTML = STORE.memory.map(m => `
+    <div class="mem-item">
+      <div class="mem-ic">${m.icon}</div>
+      <div style="flex:1;">
+        <div class="mem-txt">${escapeHtml(m.text)}</div>
+        <div class="mem-date">${new Date(m.date).toLocaleDateString('ru-RU')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function openDrawer(){ $('drawer').classList.add('on'); $('overlay').classList.add('on'); }
 function closeDrawer(){ $('drawer').classList.remove('on'); $('overlay').classList.remove('on'); }
-function openModal(id){ closeDrawer(); $(id).classList.add('on'); }
+function openModal(id){
+  closeDrawer();
+  if (id === 'moodModal') updateMoodModal();
+  if (id === 'memoryModal') renderMemory();
+  $(id).classList.add('on');
+}
 function closeModals(){ document.querySelectorAll('.modal').forEach(m => m.classList.remove('on')); }
 
 function toast(msg){
   const el = $('toast'); el.textContent = msg; el.classList.add('on');
   clearTimeout(toast._t);
   toast._t = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+function exportDialog(){
+  if (STORE.messages.length === 0) { toast('Диалог пуст'); return; }
+  let txt = `═══ Verity — Диалог ═══\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\nСообщений: ${STORE.messages.length}\n\n`;
+  STORE.messages.forEach(m => {
+    txt += `[${fmtTime(m.time)}] ${m.from === 'user' ? 'Ты' : STORE.verityName}: ${m.text}\n`;
+  });
+  try {
+    navigator.clipboard.writeText(txt).then(() => toast('📤 Скопировано'), () => downloadTxt(txt));
+  } catch(e) { downloadTxt(txt); }
+}
+function downloadTxt(txt){
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `verity_${Date.now()}.txt`; a.click();
+  URL.revokeObjectURL(url); toast('📥 Скачано');
 }
 
 /* ─── Звёзды ─── */
@@ -489,6 +665,8 @@ function init(){
   initUserId();
   load();
   renderAll();
+  updateHeaderMood();
+  updateBadges();
   initStars();
   initIntro();
 
@@ -504,19 +682,49 @@ function init(){
   $('sendBtn').addEventListener('click', send);
   $('menuBtn').addEventListener('click', openDrawer);
   $('overlay').addEventListener('click', closeDrawer);
-  $('miPush').addEventListener('click', enablePush);
+  $('avatarBtn').addEventListener('click', () => openModal('moodModal'));
+  $('miMood').addEventListener('click', () => openModal('moodModal'));
+  $('miMemory').addEventListener('click', () => openModal('memoryModal'));
+  $('miPush').addEventListener('click', () => { closeDrawer(); enablePush(); });
+  $('miSettings').addEventListener('click', () => openModal('settingsModal'));
+  $('miAbout').addEventListener('click', () => openModal('aboutModal'));
   $('miNewChat').addEventListener('click', () => {
     if (!confirm('Начать новый диалог?')) return;
-    STORE.messages = []; save(); renderAll(); closeDrawer();
+    STORE.messages = []; save(); renderAll(); closeDrawer(); toast('🔄 Новый диалог');
     setTimeout(() => pushMessage('verity', 'Хорошо, начнём заново. Как ты?'), 700);
   });
-  $('miAbout').addEventListener('click', () => openModal('aboutModal'));
-  $('pushBanner').addEventListener('click', enablePush);
+  $('miExport').addEventListener('click', () => { closeDrawer(); exportDialog(); });
+
   document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
   document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => {
     if (e.target === m) closeModals();
   }));
-  // Ping каждые 2 минуты пока открыт
+
+  $('setName').addEventListener('input', e => {
+    STORE.verityName = e.target.value.trim() || 'Verity';
+    $('logoText').textContent = STORE.verityName;
+    save();
+  });
+  $('setName').value = STORE.verityName;
+  $('logoText').textContent = STORE.verityName;
+
+  $('setTime').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.showTime = this.classList.contains('on');
+    save(); renderAll();
+  });
+  if (!STORE.showTime) $('setTime').classList.remove('on');
+
+  $('wipeBtn').addEventListener('click', () => {
+    if (!confirm('Удалить всю историю и память?')) return;
+    STORE.messages = [];
+    STORE.memory = [];
+    STORE.mood = { trust: 50, warm: 50, energy: 70, play: 50, grudge: 0 };
+    save(); renderAll(); closeModals(); updateBadges();
+    toast('Всё удалено');
+  });
+
+  $('pushBanner').addEventListener('click', enablePush);
   setInterval(pingActivity, 120000);
   pingActivity();
 }
