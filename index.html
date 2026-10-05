@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#d4af37">
-<meta name="description" content="Verity — друг, который помнит">
+<meta name="description" content="AI Artamon — три друга, одна история">
 <link rel="manifest" href="manifest.json">
-<title>Verity — друг, который помнит</title>
+<title>AI Artamon</title>
 <style>
 :root{
   --gold-1:#f6e6a8; --gold-2:#d4af37; --gold-3:#8f6f1a;
@@ -41,14 +41,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 #intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity .8s ease}
 #intro.hidden{opacity:0;pointer-events:none;display:none}
 #introCanvas{position:absolute;inset:0;z-index:1}
-.intro-logo{font-size:clamp(3rem,15vw,6rem);font-weight:900;letter-spacing:.3em;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 80px rgba(212,175,55,.6);z-index:2;opacity:0;animation:introLogoIn 1.6s cubic-bezier(.2,1.4,.4,1) forwards}
+.intro-logo{font-size:clamp(2rem,10vw,4.5rem);font-weight:900;letter-spacing:.22em;background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 45%,var(--gold-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 80px rgba(212,175,55,.6);z-index:2;opacity:0;animation:introLogoIn 1.6s cubic-bezier(.2,1.4,.4,1) forwards;padding-left:.22em;text-align:center}
 @keyframes introLogoIn{0%{opacity:0;transform:scale(.3) rotate(-15deg)}60%{opacity:1;transform:scale(1.15) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-.intro-sub{margin-top:24px;font-size:clamp(.9rem,3vw,1.2rem);color:#8a8a8a;letter-spacing:.3em;text-transform:uppercase;z-index:2;opacity:0;animation:introSubIn 1.2s ease 1.2s forwards}
+.intro-sub{margin-top:24px;font-size:clamp(.9rem,3vw,1.2rem);color:#8a8a8a;letter-spacing:.3em;text-transform:uppercase;z-index:2;opacity:0;animation:introSubIn 1.2s ease 1.2s forwards;text-align:center;padding-left:.3em}
 .intro-sub b{color:var(--gold-2)}
 @keyframes introSubIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .intro-skip{position:absolute;top:calc(20px + env(safe-area-inset-top));right:calc(20px + env(safe-area-inset-right));z-index:100;background:rgba(0,0,0,.6);border:1px solid var(--gold-3);color:var(--gold-2);padding:11px 22px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(6px)}
 
-/* Экран выбора персонажа */
 #charSelect{position:fixed;inset:0;z-index:500;background:radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 70%);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;overflow-y:auto}
 #charSelect.on{display:flex}
 #charSelect h2{font-size:clamp(1.4rem,5vw,2rem);font-weight:900;letter-spacing:.2em;text-transform:uppercase;background:linear-gradient(180deg,var(--gold-1),var(--gold-2) 45%,var(--gold-3));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;text-align:center}
@@ -96,6 +95,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 .msg.lovity .who{color:var(--lovity)}
 .msg.falsity .who{color:var(--falsity)}
 .msg .time{font-size:.62rem;color:var(--txt-3);margin-top:4px;display:block;text-align:right}
+.msg .autonomous-tag{font-size:.58rem;color:var(--accent,var(--gold-2));opacity:.5;font-style:italic;margin-top:4px;display:block;letter-spacing:.08em}
 
 .typing{align-self:flex-start;padding:14px 18px;background:linear-gradient(180deg,var(--card-bg-1),var(--card-bg-2));border:1px solid color-mix(in srgb,var(--accent,var(--gold-2)) 25%,transparent);border-radius:16px;border-bottom-left-radius:6px;display:flex;gap:5px;align-items:center}
 .typing span{width:7px;height:7px;border-radius:50%;background:var(--accent,var(--gold-2));animation:dotPulse 1.2s ease-in-out infinite}
@@ -196,15 +196,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 
 <div id="intro">
   <canvas id="introCanvas"></canvas>
-  <div class="intro-logo">VERITY</div>
-  <div class="intro-sub">друг, который <b>помнит</b></div>
+  <div class="intro-logo">AI ARTAMON</div>
+  <div class="intro-sub">три друга — <b>одна история</b></div>
   <button class="intro-skip" id="introSkip" type="button">Пропустить »</button>
 </div>
 
-<!-- Экран выбора персонажа -->
 <div id="charSelect">
   <h2>Выбери друга</h2>
-  <div class="sub">С кем хочешь поговорить?</div>
+  <div class="sub">AI Artamon · v1.0</div>
   <div class="char-grid" id="charGrid"></div>
 </div>
 
@@ -233,8 +232,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 
 <div id="overlay"></div>
 <aside id="drawer">
-  <h3 id="drawerTitle">Verity</h3>
-  <div style="color:var(--txt-2);font-size:.8rem;line-height:1.5;">Друг, который помнит</div>
+  <h3 id="drawerTitle">AI Artamon</h3>
+  <div style="color:var(--txt-2);font-size:.8rem;line-height:1.5;">Три друга — одна история</div>
 
   <div class="sub">Персонажи</div>
   <button class="menu-item" id="mcVerity" type="button"><span>✦</span><span>Verity</span><span class="badge-count" id="bcVerity">0</span></button>
@@ -246,6 +245,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <button class="menu-item" id="miMood" type="button"><span>💫</span><span>Настроение</span><span class="badge-count" id="moodBadge">50</span></button>
   <button class="menu-item" id="miMemory" type="button"><span>📖</span><span>Память</span><span class="badge-count" id="memBadge">0</span></button>
   <button class="menu-item" id="miPush" type="button"><span>🔔</span><span>Включить уведомления</span></button>
+  <button class="menu-item" id="miAuto" type="button"><span>🎭</span><span>Дать им поговорить</span></button>
   <button class="menu-item" id="miSettings" type="button"><span>⚙️</span><span>Настройки</span></button>
   <button class="menu-item" id="miAbout" type="button"><span>ℹ️</span><span>О приложении</span></button>
 
@@ -254,8 +254,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <button class="menu-item" id="miExport" type="button"><span>📤</span><span>Экспорт</span></button>
 
   <div style="margin-top:auto;padding-top:20px;text-align:center;color:var(--txt-3);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;line-height:1.8;">
-    Verity · Beta 0.9<br>
-    <span style="opacity:.6;">3 друга, одна история</span>
+    AI Artamon · v1.0<br>
+    <span style="opacity:.6;">три друга — одна история</span>
   </div>
 </aside>
 
@@ -264,10 +264,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
     <button class="modal-close" type="button" data-close>×</button>
     <div class="modal-title">Настроение</div>
     <div class="modal-sub" id="moodName2">Verity сейчас</div>
-    <div class="mood-card">
-      <div class="mood-big" id="moodEmoji">🙂</div>
-      <div class="mood-name" id="moodTitle">Спокоен</div>
-      <div class="mood-desc" id="moodDesc">Всё хорошо. Он рядом.</div>
+    <div class="mood-card" style="background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.3));border:1px solid color-mix(in srgb,var(--accent,var(--gold-2)) 25%,transparent);border-radius:16px;padding:22px;text-align:center;margin-bottom:18px">
+      <div class="mood-big" id="moodEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:12px;filter:drop-shadow(0 0 20px color-mix(in srgb,var(--accent,var(--gold-2)) 60%,transparent))">🙂</div>
+      <div class="mood-name" id="moodTitle" style="font-size:1.3rem;font-weight:800;color:var(--accent,var(--gold-2));margin-bottom:6px">Спокоен</div>
+      <div class="mood-desc" id="moodDesc" style="font-size:.82rem;color:var(--txt-2)">Всё хорошо. Он рядом.</div>
     </div>
     <div class="stat-row"><div class="stat-ic">🤝</div><div class="stat-info"><div class="stat-lbl">Доверие</div><div class="stat-bar"><div class="stat-fill" id="barTrust"></div></div></div><div class="stat-val" id="valTrust">50</div></div>
     <div class="stat-row"><div class="stat-ic">💛</div><div class="stat-info"><div class="stat-lbl">Теплота</div><div class="stat-bar"><div class="stat-fill" id="barWarm"></div></div></div><div class="stat-val" id="valWarm">50</div></div>
@@ -290,9 +290,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
   <div class="modal-box">
     <button class="modal-close" type="button" data-close>×</button>
     <div class="modal-title">⚙️ Настройки</div>
-    <div class="modal-sub secret" id="secretTap">Verity Beta 0.9</div>
+    <div class="modal-sub secret" id="secretTap">AI Artamon v1.0</div>
     <div class="set-row"><div><div class="set-title">Показывать время</div><div class="set-desc">В сообщениях</div></div><div class="switch on" id="setTime"></div></div>
     <div class="set-row"><div><div class="set-title">Спонтанные сообщения</div><div class="set-desc">Друг пишет сам, если долго молчишь</div></div><div class="switch on" id="setSpontaneous"></div></div>
+    <div class="set-row"><div><div class="set-title">Автономный диалог в группе</div><div class="set-desc">Персонажи общаются сами, если ты молчишь</div></div><div class="switch on" id="setAutoDialog"></div></div>
     <div class="set-row"><div><div class="set-title">Возраст</div><div class="set-desc">Меняет стиль общения</div></div><input type="number" class="set-input" id="setAge" placeholder="?" min="1" max="120"></div>
     <div class="set-row"><div><div class="set-title">Удалить всё</div><div class="set-desc">История + память (все чаты)</div></div><button class="btn danger" id="wipeBtn" type="button">Удалить</button></div>
   </div>
@@ -301,8 +302,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
 <div class="modal" id="aboutModal">
   <div class="modal-box">
     <button class="modal-close" type="button" data-close>×</button>
-    <div class="modal-title">О Verity</div>
-    <div class="modal-sub">Три друга, один разговор</div>
+    <div class="modal-title">AI Artamon</div>
+    <div class="modal-sub">v1.0 · три друга — одна история</div>
     <div style="color:var(--txt-2);font-size:.9rem;line-height:1.7;">
       <b style="color:#d4af37;">Verity</b> — ревнивый и тревожный.<br>
       <b style="color:#e89bb8;">Lovity</b> — мягкая, защищает тебя.<br>
@@ -311,7 +312,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
     </div>
     <div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid var(--card-border);color:var(--txt-3);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;">
       Автор · Артем Колыбельский<br>
-      <span style="opacity:.6;">Beta 0.9 · 2026</span>
+      <span style="opacity:.6;">AI Artamon · v1.0 · 2026</span>
     </div>
   </div>
 </div>
@@ -336,10 +337,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
     <div class="dev-section">
       <div class="dev-h"><span class="num">1</span> Статистика</div>
       <div class="dev-row"><span class="lbl">userId</span><span class="val" id="devUserId">—</span></div>
-      <div class="dev-row"><span class="lbl">Сообщений (чат)</span><span class="val" id="devMsgCount">0</span></div>
-      <div class="dev-row"><span class="lbl">Память (записей)</span><span class="val" id="devMemCount">0</span></div>
+      <div class="dev-row"><span class="lbl">Сообщений</span><span class="val" id="devMsgCount">0</span></div>
+      <div class="dev-row"><span class="lbl">Память</span><span class="val" id="devMemCount">0</span></div>
       <div class="dev-row"><span class="lbl">Возраст</span><span class="val" id="devAge">—</span></div>
-      <div class="dev-row"><span class="lbl">Размер storage</span><span class="val" id="devSize">—</span></div>
+      <div class="dev-row"><span class="lbl">Storage</span><span class="val" id="devSize">—</span></div>
     </div>
 
     <div class="dev-section">
@@ -356,6 +357,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
       <div class="dev-actions">
         <button class="btn angry" id="devTriggerAngry" type="button">😡 Ярость</button>
         <button class="btn purple" id="devTriggerSpont" type="button">💭 Спонтанное</button>
+        <button class="btn purple" id="devTriggerAuto" type="button">🎭 Авто-сцена</button>
         <button class="btn" id="devTriggerAge" type="button">🎂 Возраст заново</button>
       </div>
     </div>
@@ -375,7 +377,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
         <button class="btn small" id="devMemAdd" type="button">➕ Добавить</button>
         <button class="btn danger small" id="devMemClear" type="button">🗑 Очистить</button>
       </div>
-      <div style="margin-top:8px;font-size:.72rem;color:var(--txt-3);line-height:1.5">Формат: <b style="color:#d4af37">иконка|текст</b></div>
+      <div style="margin-top:8px;font-size:.72rem;color:var(--txt-3);line-height:1.5">Формат: <b style="color:var(--accent,var(--gold-2))">иконка|текст</b></div>
     </div>
 
     <div class="dev-section">
@@ -397,7 +399,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg-1);color:var(--txt-1);
       </div>
     </div>
 
-    <div class="dev-warn">⚠️ Панель разработчика. Изменения мгновенны.</div>
+    <div class="dev-warn">⚠️ AI Artamon Dev Panel. Изменения мгновенны.</div>
   </div>
 </div>
 
@@ -415,13 +417,13 @@ const uid = () => now().toString(36) + Math.random().toString(36).slice(2,7);
 const escapeHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const API_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/api/ai/chat';
+const AUTO_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/auto-dialog';
 const SUBSCRIBE_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/subscribe';
 const PING_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/ping';
 const TEST_PUSH_URL = 'https://damp-silence-ff30.artem123kv.workers.dev/test-push';
 const VAPID_PUBLIC = "BHAMI-kmZTSVa8w6cRd8pr18MmVG66vknMh8x6kNIDzLDpuOAzMspGkGlxB1EVE66PmoVjAUlG5VnDJN3dAQTjk";
 const DEV_PASSWORD = "verity-admin-2026";
 
-/* ─── Персонажи ─── */
 const CHARACTERS = {
   verity:  { name: 'Verity',  icon: '✦', color: '#d4af37', desc: 'Ревнивый и тревожный' },
   lovity:  { name: 'Lovity',  icon: '♡', color: '#e89bb8', desc: 'Мягкая, защищает тебя' },
@@ -429,20 +431,20 @@ const CHARACTERS = {
   group:   { name: 'Группа',  icon: '👥', color: '#a78bfa', desc: 'Все трое вместе' }
 };
 
-/* ─── Хранилище ─── */
-const STORE_KEY = 'verity_v4';
+const STORE_KEY = 'artamon_v1';
 let STORE = {
   currentChar: 'verity',
   chats: {},
   global: {
     showTime: true,
     spontaneous: true,
+    autoDialog: true,
     age: null,
-    devUnlocked: false
+    devUnlocked: false,
+    lastAutoScene: 0
   }
 };
 
-/* Дефолт для одного чата */
 function newChat() {
   return {
     messages: [],
@@ -462,10 +464,10 @@ function ensureChats(){
 function currentChat(){ return STORE.chats[STORE.currentChar] || newChat(); }
 
 function initUserId(){
-  let id = localStorage.getItem('verity_userId');
+  let id = localStorage.getItem('artamon_userId');
   if (!id) {
     id = 'u_' + Math.random().toString(36).slice(2,10) + now().toString(36);
-    localStorage.setItem('verity_userId', id);
+    localStorage.setItem('artamon_userId', id);
   }
   STORE.userId = id;
 }
@@ -474,10 +476,7 @@ function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }c
 function load(){
   try{
     const r = localStorage.getItem(STORE_KEY);
-    if (r) {
-      const data = JSON.parse(r);
-      STORE = Object.assign(STORE, data);
-    }
+    if (r) STORE = Object.assign(STORE, JSON.parse(r));
   }catch(e){}
   ensureChats();
 }
@@ -556,9 +555,7 @@ async function askCharacter(character, userText, chat, speakingAs){
   if (STORE.global.age) params.set('age', STORE.global.age);
   if (speakingAs) params.set('speakingAs', speakingAs);
   if (character === 'group' && speakingAs) {
-    // В группе у каждого своё настроение — передаём от того, кто говорит
-    const subChar = speakingAs.toLowerCase();
-    const subChat = STORE.chats[subChar] || chat;
+    const subChat = STORE.chats[speakingAs.toLowerCase()] || chat;
     params.set('mood', JSON.stringify(subChat.mood));
   } else {
     params.set('mood', JSON.stringify(chat.mood));
@@ -568,21 +565,38 @@ async function askCharacter(character, userText, chat, speakingAs){
   const timer = setTimeout(() => controller.abort(), 45000);
 
   try {
-    const res = await fetch(API_URL + '?' + params.toString(), {
-      method: 'GET',
-      signal: controller.signal
-    });
+    const res = await fetch(API_URL + '?' + params.toString(), { method: 'GET', signal: controller.signal });
     clearTimeout(timer);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     if (!data.reply) throw new Error('Пустой ответ');
-    const parts = Array.isArray(data.parts) && data.parts.length ? data.parts : [data.reply];
-    return parts;
+    return Array.isArray(data.parts) && data.parts.length ? data.parts : [data.reply];
   } catch(e) {
     clearTimeout(timer);
     console.warn('⚠ API [' + character + ']:', e.message);
     return null;
+  }
+}
+
+async function askAutoScene(lastUserMsg, idleMinutes){
+  const params = new URLSearchParams();
+  params.set('lastUser', lastUserMsg);
+  params.set('idle', idleMinutes);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 90000);
+
+  try {
+    const res = await fetch(AUTO_URL + '?' + params.toString(), { method: 'GET', signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return Array.isArray(data.scene) ? data.scene : [];
+  } catch(e) {
+    console.warn('⚠ Auto-scene error:', e.message);
+    return [];
   }
 }
 
@@ -603,7 +617,7 @@ async function enablePush(){
   }
   try {
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') { toast('❌ Уведомления не разрешены'); return false; }
+    if (permission !== 'granted') { toast('❌ Не разрешены'); return false; }
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {
@@ -627,15 +641,14 @@ async function enablePush(){
     return true;
   } catch(e) {
     console.error(e);
-    toast('❌ Ошибка: ' + e.message);
+    toast('❌ ' + e.message);
     return false;
   }
 }
 
 function pingActivity(){
   if (!STORE.userId) return;
-  const chat = currentChat();
-  chat.lastActivity = now();
+  currentChat().lastActivity = now();
   save();
   fetch(PING_URL + '?userId=' + STORE.userId).catch(() => {});
 }
@@ -646,7 +659,6 @@ function renderMessage(msg){
   el.className = 'msg ' + (msg.from === 'user' ? 'user' : (msg.speaker || 'verity'));
   if (msg.angry) el.classList.add('angry');
 
-  // В группе — показываем кто говорит
   if (msg.from === 'verity' && msg.speaker && STORE.currentChar === 'group') {
     const w = document.createElement('span');
     w.className = 'who';
@@ -655,6 +667,13 @@ function renderMessage(msg){
     el.insertAdjacentHTML('beforeend', escapeHtml(msg.text).replace(/\n/g, '<br>'));
   } else {
     el.innerHTML = escapeHtml(msg.text).replace(/\n/g, '<br>');
+  }
+
+  if (msg.autonomous) {
+    const t = document.createElement('span');
+    t.className = 'autonomous-tag';
+    t.textContent = '· сами ·';
+    el.appendChild(t);
   }
 
   if (STORE.global.showTime) {
@@ -696,12 +715,10 @@ function pushMessage(from, text, opts){
   opts = opts || {};
   const c = currentChat();
   const msg = {
-    id: uid(),
-    from,
-    text,
-    time: now(),
+    id: uid(), from, text, time: now(),
     speaker: opts.speaker || null,
-    angry: !!opts.angry
+    angry: !!opts.angry,
+    autonomous: !!opts.autonomous
   };
   c.messages.push(msg);
   save(); renderMessage(msg); scrollBottom();
@@ -709,26 +726,26 @@ function pushMessage(from, text, opts){
 }
 
 /* ─── UI helpers ─── */
-function setAccent(color){
-  document.documentElement.style.setProperty('--accent', color);
-}
+function setAccent(color){ document.documentElement.style.setProperty('--accent', color); }
+
 function applyCharacterUI(){
   const ch = CHARACTERS[STORE.currentChar];
   setAccent(ch.color);
   $('hdrIc').textContent = ch.icon;
   $('logoName').textContent = ch.name;
   $('avatarBtn').textContent = ch.icon;
-  $('drawerTitle').textContent = ch.name;
+  $('drawerTitle').textContent = STORE.currentChar === 'group' ? 'AI Artamon' : ch.name;
   document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('current'));
   const map = { verity: 'mcVerity', lovity: 'mcLovity', falsity: 'mcFalsity', group: 'mcGroup' };
   if (map[STORE.currentChar]) $(map[STORE.currentChar]).classList.add('current');
-  // Обновить иконку у баннера
   $('pushBanner').textContent = '🔔 Уведомления от ' + ch.name;
 }
+
 function updateHeaderMood(){
   const c = currentChat();
   $('moodSub').textContent = MOOD_LABELS[currentMoodKey(c)].name.toLowerCase();
 }
+
 function updateBadges(){
   ['verity','lovity','falsity','group'].forEach(k => {
     const badge = { verity: 'bcVerity', lovity: 'bcLovity', falsity: 'bcFalsity', group: 'bcGroup' }[k];
@@ -741,7 +758,7 @@ function updateBadges(){
   $('memBadge').textContent = c.memory.length;
 }
 
-/* ─── Ответы: одиночный персонаж ─── */
+/* ─── Ответы: одиночный ─── */
 async function replySingle(userText, character){
   const c = STORE.chats[character];
   const typing = document.createElement('div');
@@ -756,9 +773,7 @@ async function replySingle(userText, character){
     pushMessage('verity', 'Извини. Что-то не так. Попробуй ещё.', { speaker: character });
     return;
   }
-
   const isAngry = c.mood.grudge > 70;
-
   for (let i = 0; i < parts.length; i++) {
     pushMessage('verity', parts[i], { speaker: character, angry: isAngry });
     if (i < parts.length - 1) {
@@ -776,17 +791,9 @@ async function replySingle(userText, character){
 /* ─── Ответы: группа ─── */
 async function replyGroup(userText){
   const groupChat = STORE.chats.group;
-
-  // Все три персонажа. Решаем, кто отвечает — с 80% шансом, минимум 2 отвечают.
   const chars = ['verity','lovity','falsity'];
-
-  // Первый: обязательно (вероятность 95%)
-  // Второй: 75%
-  // Третий: 55%
   const probabilities = [0.95, 0.75, 0.55];
   const willRespond = chars.map((c, i) => Math.random() < probabilities[i]);
-
-  // Минимум 2 должны ответить
   let countYes = willRespond.filter(Boolean).length;
   if (countYes < 2) {
     const shuffled = [0,1,2].sort(() => Math.random() - 0.5);
@@ -794,54 +801,36 @@ async function replyGroup(userText){
       if (!willRespond[shuffled[i]]) { willRespond[shuffled[i]] = true; countYes++; }
     }
   }
-
   const respondents = chars.filter((c, i) => willRespond[i]);
 
-  // Последние 1-2 сообщения в группе (для контекста спора)
   let lastReplica = null;
-
   for (let idx = 0; idx < respondents.length; idx++) {
     const speaker = respondents[idx];
     const ch = CHARACTERS[speaker];
 
-    // Показываем typing
     const typing = document.createElement('div');
     typing.className = 'typing';
     typing.innerHTML = '<span></span><span></span><span></span>';
     $('chat').appendChild(typing); scrollBottom();
 
-    // Собираем контекст для промпта
-    // Для первого — только сообщение пользователя.
-    // Для последующих — добавляем последнюю реплику другого персонажа в message.
     let messageForApi = userText;
     if (lastReplica) {
       messageForApi = `Пользователь сказал: "${userText}"\n\n${lastReplica.name} сказал: "${lastReplica.text}"\n\nОтветь от лица ${ch.name}. Если хочешь — отреагируй на слова ${lastReplica.name}, но не говори за других.`;
     }
 
-    // Свой чат для истории (индивидуальный)
     const personalChat = STORE.chats[speaker];
-    // Но история группы важнее — соберём последние 4 сообщения группы
     const groupHistory = groupChat.messages.slice(-4).map(m => ({
-      role: m.from === 'user' ? 'user' : 'assistant',
-      content: (m.speaker ? `[${CHARACTERS[m.speaker]?.name || m.speaker}]: ` : '') + m.text
+      from: m.from === 'user' ? 'user' : 'verity',
+      text: (m.speaker ? `[${CHARACTERS[m.speaker]?.name || m.speaker}]: ` : '') + m.text
     }));
-
-    // Временный чат для API
-    const tempChat = {
-      messages: groupHistory.map(h => ({ from: h.role === 'user' ? 'user' : 'verity', text: h.content })),
-      mood: personalChat.mood
-    };
+    const tempChat = { messages: groupHistory, mood: personalChat.mood };
 
     const parts = await askCharacter('group', messageForApi, tempChat, ch.name);
     typing.remove();
-
-    if (!parts) {
-      continue;
-    }
+    if (!parts) continue;
 
     const isAngry = personalChat.mood.grudge > 70;
     let fullText = '';
-
     for (let i = 0; i < parts.length; i++) {
       pushMessage('verity', parts[i], { speaker, angry: isAngry });
       fullText += (i > 0 ? ' ' : '') + parts[i];
@@ -854,14 +843,8 @@ async function replyGroup(userText){
         t2.remove();
       }
     }
-
-    // Запоминаем последнюю реплику — чтобы следующему было к чему реагировать
     lastReplica = { name: ch.name, text: fullText };
-
-    // Пауза перед следующим
-    if (idx < respondents.length - 1) {
-      await new Promise(r => setTimeout(r, 700 + Math.random()*500));
-    }
+    if (idx < respondents.length - 1) await new Promise(r => setTimeout(r, 700 + Math.random()*500));
   }
   updateHeaderMood(); updateBadges();
 }
@@ -872,37 +855,26 @@ async function verityReply(userText){
   if (intro) intro.remove();
 
   const c = currentChat();
-
-  // Обновляем настроение только у одиночных чатов и у группы (усреднённо)
   const intent = analyzeIntent(userText);
-  if (STORE.currentChar !== 'group') {
-    updateMood(c, intent);
-  } else {
-    ['verity','lovity','falsity'].forEach(k => updateMood(STORE.chats[k], intent));
-  }
+  if (STORE.currentChar !== 'group') updateMood(c, intent);
+  else ['verity','lovity','falsity'].forEach(k => updateMood(STORE.chats[k], intent));
 
   extractMemory(userText).forEach(mm => {
     if (!c.memory.some(x => x.text === mm.text)) {
       c.memory.push({ id: uid(), text: mm.text, icon: mm.icon, date: now() });
     }
   });
-  save();
-  updateBadges();
+  save(); updateBadges();
 
-  if (STORE.currentChar === 'group') {
-    await replyGroup(userText);
-  } else {
-    await replySingle(userText, STORE.currentChar);
-  }
+  if (STORE.currentChar === 'group') await replyGroup(userText);
+  else await replySingle(userText, STORE.currentChar);
 }
 
 function send(){
   const text = $('input').value.trim();
   if (!text) return;
-
   const c = currentChat();
 
-  // Возраст — только в одиночных чатах (в группе спрашиваем через Verity)
   if (c.awaitingAge && STORE.currentChar !== 'group') {
     pushMessage('user', text);
     $('input').value = ''; $('input').style.height = 'auto';
@@ -911,7 +883,6 @@ function send(){
     handleAgeInput(text);
     return;
   }
-
   pushMessage('user', text);
   $('input').value = ''; $('input').style.height = 'auto';
   $('sendBtn').disabled = true;
@@ -934,10 +905,7 @@ function startAgeCheck(){
 function tryParseAge(text){
   const t = text.toLowerCase().trim();
   const m1 = t.match(/\b(\d{1,3})\b/);
-  if (m1) {
-    const n = parseInt(m1[1], 10);
-    if (n >= 1 && n <= 120) return n;
-  }
+  if (m1) { const n = parseInt(m1[1], 10); if (n >= 1 && n <= 120) return n; }
   const words = {'десять':10,'одиннадцать':11,'двенадцать':12,'тринадцать':13,'четырнадцать':14,'пятнадцать':15,'шестнадцать':16,'семнадцать':17,'восемнадцать':18,'девятнадцать':19,'двадцать':20,'тридцать':30,'сорок':40,'пятьдесят':50};
   for (const w in words) if (t.includes(w)) return words[w];
   return null;
@@ -946,28 +914,24 @@ function handleAgeInput(text){
   const c = currentChat();
   const age = tryParseAge(text);
   if (age) {
-    STORE.global.age = age;
-    c.awaitingAge = false;
-    save();
+    STORE.global.age = age; c.awaitingAge = false; save();
     const extra = age < 16 ? ' Я буду бережно с тобой.' : age < 18 ? ' Понял, буду аккуратнее.' : ' Понял, спасибо.';
     setTimeout(() => pushMessage('verity', 'Запомнил.' + extra), 400);
     setTimeout(() => pushMessage('verity', 'О чём хочешь поговорить?'), 1600);
     $('setAge').value = age;
     return true;
   }
-  c.awaitingAge = false;
-  save();
+  c.awaitingAge = false; save();
   setTimeout(() => pushMessage('verity', 'Хорошо, не буду настаивать. Просто побудем вместе.'), 400);
   return false;
 }
 
-/* ─── Спонтанные сообщения ─── */
+/* ─── Спонтанные ─── */
 function startSpontaneousLoop(){
   setInterval(async () => {
     if (!STORE.global.spontaneous) return;
     if (document.hidden) return;
-    if (STORE.currentChar === 'group') return; // в группе не спамим
-
+    if (STORE.currentChar === 'group') return;
     const c = currentChat();
     if (c.awaitingAge) return;
     if (c.messages.length === 0) return;
@@ -983,7 +947,6 @@ function startSpontaneousLoop(){
     c.lastSpontaneousCheck = now();
     save();
 
-    // Стиль фраз зависит от персонажа
     const char = STORE.currentChar;
     let phrases;
     if (isAngry) {
@@ -995,9 +958,7 @@ function startSpontaneousLoop(){
       else if (char === 'lovity') phrases = ['Я скучаю…','Как ты? Я рядом.','Обнимаю тебя через экран.'];
       else phrases = ['Ты тут?','Мне холодно без тебя…','Я скучаю.','Ты меня не забыл?'];
     }
-
     const count = isAngry ? Math.min(3 + Math.floor(Math.random()*3), 5) : 1 + Math.floor(Math.random()*2);
-
     for (let i = 0; i < count; i++) {
       const txt = phrases[Math.floor(Math.random() * phrases.length)];
       const typing = document.createElement('div');
@@ -1008,27 +969,88 @@ function startSpontaneousLoop(){
       typing.remove();
       pushMessage('verity', txt, { speaker: char, angry: isAngry });
     }
-
-    if (isLongIdle) {
-      c.mood.grudge = clamp(c.mood.grudge + 5, 0, 100);
-      save();
-    }
+    if (isLongIdle) { c.mood.grudge = clamp(c.mood.grudge + 5, 0, 100); save(); }
     updateHeaderMood(); updateBadges();
   }, 30000);
 }
 
+/* ═══════════════════════════════════════════════
+   АВТОНОМНЫЙ ДИАЛОГ
+   ═══════════════════════════════════════════════ */
+async function runAutoScene(opts){
+  opts = opts || {};
+  const groupChat = STORE.chats.group;
+  const idleMinutes = Math.floor((now() - groupChat.lastActivity) / 60000);
+
+  // Получаем последнее сообщение пользователя
+  let lastUserMsg = '';
+  for (let i = groupChat.messages.length - 1; i >= 0; i--) {
+    if (groupChat.messages[i].from === 'user') {
+      lastUserMsg = groupChat.messages[i].text;
+      break;
+    }
+  }
+
+  toast('🎭 Они начинают говорить...');
+
+  const scene = await askAutoScene(lastUserMsg, idleMinutes);
+  if (!scene.length) {
+    toast('❌ Не получилось');
+    return;
+  }
+
+  for (let i = 0; i < scene.length; i++) {
+    const step = scene[i];
+    const ch = CHARACTERS[step.speaker] || CHARACTERS.verity;
+
+    const typing = document.createElement('div');
+    typing.className = 'typing';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    $('chat').appendChild(typing); scrollBottom();
+    await new Promise(r => setTimeout(r, 900 + Math.random()*600));
+    typing.remove();
+
+    pushMessage('verity', step.text, { speaker: step.speaker, autonomous: true });
+    if (i < scene.length - 1) await new Promise(r => setTimeout(r, 500));
+  }
+  STORE.global.lastAutoScene = now();
+  groupChat.lastActivity = now();
+  save();
+  updateBadges();
+}
+
+function startAutoDialogLoop(){
+  setInterval(async () => {
+    if (!STORE.global.autoDialog) return;
+    if (document.hidden) return;
+    if (STORE.currentChar !== 'group') return;
+
+    const groupChat = STORE.chats.group;
+    if (groupChat.messages.length === 0) return;
+
+    const idle = now() - groupChat.lastActivity;
+    const sinceLastScene = now() - STORE.global.lastAutoScene;
+
+    // Условия: молчание > 20 минут, и прошло > 30 минут с последней сцены
+    if (idle < 20 * 60 * 1000) return;
+    if (sinceLastScene < 30 * 60 * 1000) return;
+    // Шанс 50% — чтобы не спамить
+    if (Math.random() > 0.5) return;
+
+    await runAutoScene();
+  }, 60000);
+}
+
 /* ═══ DEV PANEL ═══ */
-let secretTaps = 0;
-let secretTapTimer = null;
+let secretTaps = 0, secretTapTimer = null;
 function handleSecretTap(){
   secretTaps++;
   clearTimeout(secretTapTimer);
   secretTapTimer = setTimeout(() => { secretTaps = 0; }, 2000);
   if (secretTaps >= 5) {
     secretTaps = 0;
-    if (STORE.global.devUnlocked) {
-      openDevPanel();
-    } else {
+    if (STORE.global.devUnlocked) openDevPanel();
+    else {
       closeModals();
       $('devPassInput').value = '';
       $('devPassErr').style.display = 'none';
@@ -1040,8 +1062,7 @@ function handleSecretTap(){
 function tryDevLogin(){
   const v = $('devPassInput').value;
   if (v === DEV_PASSWORD) {
-    STORE.global.devUnlocked = true;
-    save();
+    STORE.global.devUnlocked = true; save();
     $('devAuthModal').classList.remove('on');
     toast('🔓 Доступ разрешён');
     setTimeout(openDevPanel, 300);
@@ -1085,7 +1106,6 @@ function initDevPanel(){
   $('secretTap').addEventListener('click', handleSecretTap);
   $('devPassBtn').addEventListener('click', tryDevLogin);
   $('devPassInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryDevLogin(); });
-
   bindDevSlider('devTrust','trust','devTrustV');
   bindDevSlider('devWarm','warm','devWarmV');
   bindDevSlider('devEnergy','energy','devEnergyV');
@@ -1098,7 +1118,6 @@ function initDevPanel(){
     toast('😡 Ярость');
     updateHeaderMood(); updateBadges();
   });
-
   $('devTriggerSpont').addEventListener('click', async () => {
     toast('💭...');
     const char = STORE.currentChar;
@@ -1116,6 +1135,15 @@ function initDevPanel(){
     closeModals();
   });
 
+  $('devTriggerAuto').addEventListener('click', async () => {
+    closeModals();
+    if (STORE.currentChar !== 'group') {
+      toast('⚠️ Сначала открой Группу');
+      return;
+    }
+    await runAutoScene();
+  });
+
   $('devTriggerAge').addEventListener('click', () => {
     STORE.global.age = null;
     currentChat().awaitingAge = true;
@@ -1124,7 +1152,6 @@ function initDevPanel(){
     setTimeout(() => pushMessage('verity', 'Скажи, сколько тебе лет?', { speaker: STORE.currentChar }), 500);
     toast('🎂 Возраст сброшен');
   });
-
   $('devAgeSet').addEventListener('click', () => {
     const v = parseInt($('devAgeInput').value, 10);
     if (v >= 1 && v <= 120) { STORE.global.age = v; save(); refreshDevPanel(); toast('✅ ' + v); }
@@ -1134,9 +1161,8 @@ function initDevPanel(){
     STORE.global.age = null; save(); refreshDevPanel();
     toast('Возраст сброшен');
   });
-
   $('devMemAdd').addEventListener('click', () => {
-    const v = prompt('Формат: иконка|текст\nПример: 🎮|Играет в Dota 2');
+    const v = prompt('Формат: иконка|текст');
     if (!v) return;
     const parts = v.split('|');
     if (parts.length < 2) { toast('❌ иконка|текст'); return; }
@@ -1144,13 +1170,11 @@ function initDevPanel(){
     save(); refreshDevPanel(); updateBadges();
     toast('➕');
   });
-
   $('devMemClear').addEventListener('click', () => {
-    if (!confirm('Очистить память этого чата?')) return;
+    if (!confirm('Очистить память?')) return;
     currentChat().memory = []; save(); refreshDevPanel(); updateBadges();
     toast('🗑');
   });
-
   $('devExport').addEventListener('click', () => {
     const data = {
       currentChar: STORE.currentChar,
@@ -1159,16 +1183,11 @@ function initDevPanel(){
       exportedAt: new Date().toISOString()
     };
     Object.keys(STORE.chats).forEach(k => {
-      data.chats[k] = {
-        messages: STORE.chats[k].messages,
-        memory: STORE.chats[k].memory,
-        mood: STORE.chats[k].mood
-      };
+      data.chats[k] = { messages: STORE.chats[k].messages, memory: STORE.chats[k].memory, mood: STORE.chats[k].mood };
     });
     $('devJsonArea').value = JSON.stringify(data, null, 2);
-    toast('📤 Готово');
+    toast('📤');
   });
-
   $('devImportBtn').addEventListener('click', () => {
     try {
       const data = JSON.parse($('devJsonArea').value);
@@ -1182,21 +1201,16 @@ function initDevPanel(){
       }
       if (data.age !== undefined) STORE.global.age = data.age;
       save(); renderAll(); refreshDevPanel(); updateHeaderMood(); updateBadges();
-      toast('📥 Импортировано');
-    } catch(e) {
-      toast('❌ ' + e.message);
-    }
+      toast('📥');
+    } catch(e) { toast('❌ ' + e.message); }
   });
-
   $('devHardReset').addEventListener('click', () => {
-    if (!confirm('⚠️ СБРОС: все чаты, память, настроение. Продолжить?')) return;
-    STORE.chats = {};
-    ensureChats();
+    if (!confirm('⚠️ СБРОС?')) return;
+    STORE.chats = {}; ensureChats();
     STORE.global.age = null;
     save(); renderAll(); refreshDevPanel(); updateHeaderMood(); updateBadges();
     toast('💣');
   });
-
   $('devTestApi').addEventListener('click', async () => {
     toast('🔌...');
     try {
@@ -1205,7 +1219,6 @@ function initDevPanel(){
       toast(d.reply ? '✅ API OK' : '❌');
     } catch(e) { toast('❌ ' + e.message); }
   });
-
   $('devTestPush').addEventListener('click', async () => {
     toast('🔔...');
     try {
@@ -1296,7 +1309,6 @@ function initIntro(){
     intro.classList.add('hidden');
     setTimeout(() => {
       intro.style.display = 'none';
-      // Показываем экран выбора персонажа
       showCharSelect();
     }, 700);
   }
@@ -1304,7 +1316,7 @@ function initIntro(){
   setTimeout(skip, 4000);
 }
 
-/* ─── Экран выбора персонажа ─── */
+/* ─── Экран выбора ─── */
 function showCharSelect(){
   const grid = $('charGrid');
   grid.innerHTML = '';
@@ -1337,104 +1349,16 @@ function selectChar(key){
   renderAll();
   updateHeaderMood();
   updateBadges();
-  // Автовопрос возраста в одиночных чатах при первом входе
   const c = currentChat();
   if (key !== 'group' && !STORE.global.age && c.messages.length === 0) {
     setTimeout(startAgeCheck, 700);
   }
-  // Баннер уведомлений
   setTimeout(() => {
     if (Notification.permission !== 'granted') $('pushBanner').classList.add('show');
   }, 4000);
 }
 
-/* ─── INIT ─── */
-function init(){
-  initUserId();
-  load();
-  initStars();
-  initIntro();
-  initDevPanel();
-  ensureChats();
-
-  const input = $('input');
-  input.addEventListener('input', () => {
-    input.style.height = 'auto';
-    input.style.height = Math.min(120, input.scrollHeight) + 'px';
-    $('sendBtn').disabled = !input.value.trim();
-  });
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-  });
-  $('sendBtn').addEventListener('click', send);
-
-  $('menuBtn').addEventListener('click', openDrawer);
-  $('overlay').addEventListener('click', closeDrawer);
-  $('avatarBtn').addEventListener('click', () => openModal('moodModal'));
-
-  // Переключение персонажей
-  $('mcVerity').addEventListener('click', () => { closeDrawer(); selectChar('verity'); });
-  $('mcLovity').addEventListener('click', () => { closeDrawer(); selectChar('lovity'); });
-  $('mcFalsity').addEventListener('click', () => { closeDrawer(); selectChar('falsity'); });
-  $('mcGroup').addEventListener('click', () => { closeDrawer(); selectChar('group'); });
-
-  // Смена персонажа из меню — возврат на экран выбора
-  $('miMood').addEventListener('click', () => openModal('moodModal'));
-  $('miMemory').addEventListener('click', () => openModal('memoryModal'));
-  $('miPush').addEventListener('click', () => { closeDrawer(); enablePush(); });
-  $('miSettings').addEventListener('click', () => openModal('settingsModal'));
-  $('miAbout').addEventListener('click', () => openModal('aboutModal'));
-
-  $('miNewChat').addEventListener('click', () => {
-    if (!confirm('Очистить историю этого чата?')) return;
-    currentChat().messages = [];
-    save(); renderAll(); closeDrawer(); updateBadges();
-    toast('🔄 Чат очищен');
-  });
-  $('miExport').addEventListener('click', () => { closeDrawer(); exportDialog(); });
-
-  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
-  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => {
-    if (e.target === m) closeModals();
-  }));
-
-  $('setTime').addEventListener('click', function(){
-    this.classList.toggle('on');
-    STORE.global.showTime = this.classList.contains('on');
-    save(); renderAll();
-  });
-  if (!STORE.global.showTime) $('setTime').classList.remove('on');
-
-  $('setSpontaneous').addEventListener('click', function(){
-    this.classList.toggle('on');
-    STORE.global.spontaneous = this.classList.contains('on');
-    save();
-  });
-  if (!STORE.global.spontaneous) $('setSpontaneous').classList.remove('on');
-
-  $('setAge').addEventListener('input', e => {
-    const v = parseInt(e.target.value, 10);
-    if (v >= 1 && v <= 120) { STORE.global.age = v; save(); }
-    else if (!e.target.value) { STORE.global.age = null; save(); }
-  });
-  if (STORE.global.age) $('setAge').value = STORE.global.age;
-
-  $('wipeBtn').addEventListener('click', () => {
-    if (!confirm('Удалить ВСЁ — все чаты, память, настройки?')) return;
-    STORE.chats = {};
-    ensureChats();
-    STORE.global.age = null;
-    save(); renderAll(); closeModals(); updateBadges();
-    toast('Всё удалено');
-  });
-
-  $('pushBanner').addEventListener('click', enablePush);
-  setInterval(pingActivity, 120000);
-
-  startSpontaneousLoop();
-}
-
-/* ─── Модалки: спец-наполнение ─── */
+/* ─── Модалки ─── */
 function openModal(id){
   closeDrawer();
   if (id === 'moodModal') {
@@ -1474,12 +1398,12 @@ function openModal(id){
   $(id).classList.add('on');
 }
 
-/* ─── Экспорт диалога ─── */
+/* ─── Экспорт ─── */
 function exportDialog(){
   const c = currentChat();
   if (c.messages.length === 0) { toast('Диалог пуст'); return; }
   const ch = CHARACTERS[STORE.currentChar];
-  let txt = `═══ ${ch.name} — Диалог ═══\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\nСообщений: ${c.messages.length}\n\n`;
+  let txt = `═══ ${ch.name} — ${new Date().toLocaleString('ru-RU')} ═══\n\n`;
   c.messages.forEach(m => {
     const who = m.from === 'user' ? 'Ты' : (m.speaker ? CHARACTERS[m.speaker].name : ch.name);
     txt += `[${fmtTime(m.time)}] ${who}: ${m.text}\n`;
@@ -1492,11 +1416,10 @@ function downloadTxt(txt){
   const blob = new Blob([txt], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `verity_${Date.now()}.txt`; a.click();
-  URL.revokeObjectURL(url); toast('📥 Скачано');
+  a.href = url; a.download = `artamon_${Date.now()}.txt`; a.click();
+  URL.revokeObjectURL(url); toast('📥');
 }
 
-/* ─── Drawer ─── */
 function openDrawer(){ $('drawer').classList.add('on'); $('overlay').classList.add('on'); }
 function closeDrawer(){ $('drawer').classList.remove('on'); $('overlay').classList.remove('on'); }
 function closeModals(){ document.querySelectorAll('.modal').forEach(m => m.classList.remove('on')); }
@@ -1505,6 +1428,103 @@ function toast(msg){
   const el = $('toast'); el.textContent = msg; el.classList.add('on');
   clearTimeout(toast._t);
   toast._t = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+/* ─── INIT ─── */
+function init(){
+  initUserId();
+  load();
+  initStars();
+  initIntro();
+  initDevPanel();
+  ensureChats();
+
+  const input = $('input');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(120, input.scrollHeight) + 'px';
+    $('sendBtn').disabled = !input.value.trim();
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  $('sendBtn').addEventListener('click', send);
+
+  $('menuBtn').addEventListener('click', openDrawer);
+  $('overlay').addEventListener('click', closeDrawer);
+  $('avatarBtn').addEventListener('click', () => openModal('moodModal'));
+
+  $('mcVerity').addEventListener('click', () => { closeDrawer(); selectChar('verity'); });
+  $('mcLovity').addEventListener('click', () => { closeDrawer(); selectChar('lovity'); });
+  $('mcFalsity').addEventListener('click', () => { closeDrawer(); selectChar('falsity'); });
+  $('mcGroup').addEventListener('click', () => { closeDrawer(); selectChar('group'); });
+
+  $('miMood').addEventListener('click', () => openModal('moodModal'));
+  $('miMemory').addEventListener('click', () => openModal('memoryModal'));
+  $('miPush').addEventListener('click', () => { closeDrawer(); enablePush(); });
+  $('miAuto').addEventListener('click', () => {
+    closeDrawer();
+    if (STORE.currentChar !== 'group') { selectChar('group'); }
+    setTimeout(() => runAutoScene(), 500);
+  });
+  $('miSettings').addEventListener('click', () => openModal('settingsModal'));
+  $('miAbout').addEventListener('click', () => openModal('aboutModal'));
+
+  $('miNewChat').addEventListener('click', () => {
+    if (!confirm('Очистить историю этого чата?')) return;
+    currentChat().messages = [];
+    save(); renderAll(); closeDrawer(); updateBadges();
+    toast('🔄 Чат очищен');
+  });
+  $('miExport').addEventListener('click', () => { closeDrawer(); exportDialog(); });
+
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => {
+    if (e.target === m) closeModals();
+  }));
+
+  $('setTime').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.global.showTime = this.classList.contains('on');
+    save(); renderAll();
+  });
+  if (!STORE.global.showTime) $('setTime').classList.remove('on');
+
+  $('setSpontaneous').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.global.spontaneous = this.classList.contains('on');
+    save();
+  });
+  if (!STORE.global.spontaneous) $('setSpontaneous').classList.remove('on');
+
+  $('setAutoDialog').addEventListener('click', function(){
+    this.classList.toggle('on');
+    STORE.global.autoDialog = this.classList.contains('on');
+    save();
+  });
+  if (!STORE.global.autoDialog) $('setAutoDialog').classList.remove('on');
+
+  $('setAge').addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10);
+    if (v >= 1 && v <= 120) { STORE.global.age = v; save(); }
+    else if (!e.target.value) { STORE.global.age = null; save(); }
+  });
+  if (STORE.global.age) $('setAge').value = STORE.global.age;
+
+  $('wipeBtn').addEventListener('click', () => {
+    if (!confirm('Удалить ВСЁ — все чаты, память, настройки?')) return;
+    STORE.chats = {}; ensureChats();
+    STORE.global.age = null;
+    save(); renderAll(); closeModals(); updateBadges();
+    toast('Всё удалено');
+  });
+
+  $('pushBanner').addEventListener('click', enablePush);
+  setInterval(pingActivity, 120000);
+  pingActivity();
+
+  startSpontaneousLoop();
+  startAutoDialogLoop();
 }
 
 if ('serviceWorker' in navigator) {
