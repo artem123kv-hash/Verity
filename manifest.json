@@ -1,7 +1,7 @@
 {
-  "name": "Verity — друг, который помнит",
-  "short_name": "Verity",
-  "description": "Виртуальный друг на базе Llama 3.3 70B",
+  "name": "AI Artamon",
+  "short_name": "Artamon",
+  "description": "Три друга — одна история. Verity, Lovity и Falsity.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
